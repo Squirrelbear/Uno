@@ -14,7 +14,15 @@
                     -> Can't Respond or Cancel Option -> Draw Card * Draw Count + Reset Draw Count to 0 -> MoveToNextTurn
 
     Wild Action -> WildColourSelection -> Set top pile colour -> MoveToNextTurn
-    +4 Action -> WildColourSelection -> Set top pile colour -> MoveToNextTurn -> TODO
+    +4 Action -> CheckCanPlayStatus -> WildColourSelection -> Set top pile colour -> MoveToNextTurn
+				-> Wait for Action Choice -> Is Challenging -> Yes -> Could previous player play a card?
+																			-> Yes -> MoveToPreviousTurn -> Draw 6 cards
+																										 -> MoveToNextPlayer
+																										 -> Draw * Draw Count + reset
+																			-> No -> Increase drawCount by 4 -> Draw * Draw Count + reset draw count
+																-> No -> Is Chaining? -> Yes -> Begin Action Play Card
+																					  -> No -> Increase drawCount by 4 -> Draw * Draw Count + reset draw count
+
 
     Skip Action: Place Card -> MoveToNextTurn -> Show Skip -> MoveToNextTurn
     Reverse Action: Place Card -> Toggle Turn Direction Order -> MoveToNextTurn
@@ -182,7 +190,6 @@ public class TurnActionFactory {
     }
 
     private static TurnAction playPlus4Action(Map<String, Integer> storedData) {
-        //TurnDecisionAction
         TurnAction drawNCards = new TurnAction(null, storedData, TurnActionFactory::drawNCards);
         TurnAction increaseDrawBy4 = new TurnAction(drawNCards, storedData, TurnActionFactory::increaseDrawCountBy4);
         TurnAction playCardAsResponse = new TurnAction(null, storedData, TurnActionFactory::drawCardAsActionFromData);
@@ -195,7 +202,7 @@ public class TurnActionFactory {
                 -1, "couldPreviousPlayCard", storedData, null);
         TurnDecisionAction isChallenging = new TurnDecisionAction(isChainingCard, couldPreviousPlayCard, 25,
                 "", storedData, TurnActionFactory::beginChallengeChoice);
-        TurnAction moveToNextTurn = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn);
+        TurnAction moveToNextTurn = new TurnAction(isChallenging, storedData, TurnActionFactory::moveNextTurn);
         TurnAction setTopOfPileColour = new TurnAction(moveToNextTurn, storedData, TurnActionFactory::setTopPileColour);
         TurnDecisionAction chooseWildColour = new TurnDecisionAction(setTopOfPileColour, setTopOfPileColour,
                 25, "wildColour", storedData, TurnActionFactory::beginWildSelection);
