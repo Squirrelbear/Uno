@@ -20,6 +20,12 @@ public class CurrentGameInterface extends WndInterface {
     private PlayDirectionAnimation playDirectionAnimation;
     private boolean isIncreasing;
 
+    private RuleSet ruleSet;
+    private static CurrentGameInterface activeSingleton;
+    public static CurrentGameInterface getCurrentGame() {
+        return activeSingleton;
+    }
+
     /**
      * Initialise the interface with bounds and make it enabled.
      *
@@ -47,6 +53,9 @@ public class CurrentGameInterface extends WndInterface {
         currentPlayerID = (int) (Math.random()*players.size());
         isIncreasing = true;
         playDirectionAnimation = new PlayDirectionAnimation(new Position(bounds.width/2,bounds.height/2), 120, 5);
+
+        ruleSet = new RuleSet();
+        activeSingleton = this;
     }
 
     @Override
@@ -180,6 +189,9 @@ public class CurrentGameInterface extends WndInterface {
         wildColourSelectorOverlay.setEnabled(false);
     }
 
+    public RuleSet getRuleSet() {
+        return ruleSet;
+    }
 
     private void createPlayers(Player.PlayerType ... playerTypes) {
         if(playerTypes.length != 2 && playerTypes.length != 4) {
