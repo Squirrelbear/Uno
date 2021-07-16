@@ -23,6 +23,10 @@ public class CurrentGameInterface extends WndInterface {
     private RuleSet ruleSet;
     private static CurrentGameInterface activeSingleton;
     public static CurrentGameInterface getCurrentGame() {
+        if(activeSingleton == null) {
+            System.out.println("???");
+        }
+
         return activeSingleton;
     }
 

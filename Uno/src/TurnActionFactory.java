@@ -95,12 +95,18 @@ public class TurnActionFactory {
         protected Map<String, Integer> storedData;
         protected Consumer<Map<String, Integer>> action;
         protected TurnAction next;
+        protected String actionDebugText;
 
-        public TurnAction(TurnAction next, Map<String, Integer> storedData, Consumer<Map<String, Integer>> action) {
+        public TurnAction(TurnAction next, Map<String, Integer> storedData, Consumer<Map<String, Integer>> action, String actionDebugText) {
             this.next = next;
             this.storedData = storedData;
             this.action = action;
+            this.actionDebugText = actionDebugText;
         }
+
+        /*public TurnAction(TurnAction next, Map<String, Integer> storedData, Consumer<Map<String, Integer>> action) {
+            this(next, storedData, action, "Not Set");
+        }*/
 
         public void performAction() {
             if(action != null) {
@@ -122,9 +128,17 @@ public class TurnActionFactory {
         private TurnAction otherNext;
         private String flagName;
 
-        public TurnDecisionAction(TurnAction next, TurnAction otherNext, int timeOut, String flagName,
+        /*public TurnDecisionAction(TurnAction next, TurnAction otherNext, int timeOut, String flagName,
                                   Map<String, Integer> storedData, Consumer<Map<String, Integer>> action) {
             super(next, storedData, action);
+            this.otherNext = otherNext;
+            this.timeOut = timeOut;
+            this.flagName = flagName;
+        }*/
+
+        public TurnDecisionAction(TurnAction next, TurnAction otherNext, int timeOut, String flagName,
+                                  Map<String, Integer> storedData, Consumer<Map<String, Integer>> action, String actionDebugText) {
+            super(next, storedData, action, actionDebugText);
             this.otherNext = otherNext;
             this.timeOut = timeOut;
             this.flagName = flagName;
@@ -148,22 +162,42 @@ public class TurnActionFactory {
         storedData.put("playerID", playerID);
         storedData.put("cardID", cardID);
         TurnAction nextSequence = cardIDToTurnAction(cardID, storedData);
-        return new TurnAction(nextSequence, storedData, TurnActionFactory::placeCard);
+        return new TurnAction(nextSequence, storedData, TurnActionFactory::placeCard, "Place Card");
+    }
+
+    public static void debugOutputTurnActionTree(TurnAction headNode) {
+        debugRecursiveNodeOutput(headNode, 0);
+    }
+
+    private static void debugRecursiveNodeOutput(TurnAction currentNode, int indentLevel) {
+        if(currentNode == null) return;
+        if(currentNode instanceof TurnDecisionAction) {
+            TurnDecisionAction currentSplitNode = (TurnDecisionAction) currentNode;
+            System.out.println("\t".repeat(indentLevel) + "? " + (indentLevel+1) + ". " + currentSplitNode.flagName
+                                + " " + currentSplitNode.timeOut + "s " + currentSplitNode.actionDebugText);
+            debugRecursiveNodeOutput(currentSplitNode.next,indentLevel+1);
+            if(currentSplitNode.next != currentSplitNode.otherNext) {
+                debugRecursiveNodeOutput(currentSplitNode.otherNext, indentLevel + 1);
+            }
+        } else {
+            System.out.println("\t".repeat(indentLevel) + "- " + (indentLevel+1) + ". " + currentNode.actionDebugText);
+            debugRecursiveNodeOutput(currentNode.next,indentLevel+1);
+        }
     }
 
     public static TurnAction drawCardAsAction(int playerID) {
         Map<String, Integer> storedData = new HashMap<>();
         storedData.put("playerID", playerID);
-        TurnAction moveToNextTurn = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn);
+        TurnAction moveToNextTurn = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
         TurnAction playCard = playCardAsActionFromData(storedData);
         TurnDecisionAction keepOrPlay = new TurnDecisionAction(moveToNextTurn, playCard, 25,
-                "keepOrPlay", storedData, TurnActionFactory::keepOrPlayChoice);
-        TurnAction keepDrawing = new TurnAction(null, storedData, TurnActionFactory::drawCardAsActionFromData);
+                "keepOrPlay", storedData, TurnActionFactory::keepOrPlayChoice, "Keep Or Play Choice");
+        TurnAction keepDrawing = new TurnAction(null, storedData, TurnActionFactory::drawCardAsActionFromData, "Draw Another Card (Recursive Tree)");
         TurnDecisionAction drawTillCanPlay = new TurnDecisionAction(moveToNextTurn,keepDrawing,-1,
-                "drawTillCanPlay?", storedData, TurnActionFactory::checkDrawTillCanPlayRule);
+                "drawTillCanPlay?", storedData, TurnActionFactory::checkDrawTillCanPlayRule, "Check Draw Till Can Play Rule");
         TurnDecisionAction canPlayCard = new TurnDecisionAction(drawTillCanPlay, keepOrPlay, -1,
-                "cardPlayable", storedData, TurnActionFactory::isCardPlayable);
-        TurnAction drawCard = new TurnAction(canPlayCard, storedData, TurnActionFactory::drawCard);
+                "cardPlayable", storedData, TurnActionFactory::isCardPlayable, "Check is the Card Playable");
+        TurnAction drawCard = new TurnAction(canPlayCard, storedData, TurnActionFactory::drawCard, "Draw a Card");
         return drawCard;
     }
 
@@ -178,59 +212,59 @@ public class TurnActionFactory {
     }
 
     private static TurnAction playPlus2Action(Map<String, Integer> storedData) {
-        TurnAction moveToNextTurn = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn);
-        TurnAction dealPenalty = new TurnAction(moveToNextTurn, storedData, TurnActionFactory::drawNCards);
+        TurnAction moveToNextTurn = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
+        TurnAction dealPenalty = new TurnAction(moveToNextTurn, storedData, TurnActionFactory::drawNCards, "Draw N Number Cards");
         TurnAction playCard = playCardAsActionFromData(storedData);
         TurnDecisionAction waitForPlay2OrCancel = new TurnDecisionAction(dealPenalty,playCard, 25,
-                "playCard", storedData, TurnActionFactory::checkForPlay2OrCancel);
+                "playCard", storedData, TurnActionFactory::checkForPlay2OrCancel, "Check for +2 or Cancel Choice");
         TurnDecisionAction checkCanRespond = new TurnDecisionAction(dealPenalty, waitForPlay2OrCancel, -1,
-                "hasPlus2AndResponseAllowed", storedData, TurnActionFactory::hasPlus2AndResponseAllowed);
-        TurnAction increaseDrawCount = new TurnAction(checkCanRespond, storedData, TurnActionFactory::increaseDrawCountBy2);
-        return new TurnAction(increaseDrawCount, storedData, TurnActionFactory::moveNextTurn);
+                "hasPlus2AndResponseAllowed", storedData, TurnActionFactory::hasPlus2AndResponseAllowed, "Can Stack and has a +2");
+        TurnAction increaseDrawCount = new TurnAction(checkCanRespond, storedData, TurnActionFactory::increaseDrawCountBy2, "Increase N (drawCount) by 2");
+        return new TurnAction(increaseDrawCount, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
     }
 
     private static TurnAction playPlus4Action(Map<String, Integer> storedData) {
-        TurnAction moveToNextSkipDamagedPlayer = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn);
-        TurnAction drawNCards = new TurnAction(moveToNextSkipDamagedPlayer, storedData, TurnActionFactory::drawNCards);
-        TurnAction increaseDrawBy4 = new TurnAction(drawNCards, storedData, TurnActionFactory::increaseDrawCountBy4);
-        TurnAction playCardAsResponse = new TurnAction(null, storedData, TurnActionFactory::drawCardAsActionFromData);
+        TurnAction moveToNextSkipDamagedPlayer = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
+        TurnAction drawNCards = new TurnAction(moveToNextSkipDamagedPlayer, storedData, TurnActionFactory::drawNCards, "Draw N Number Cards");
+        TurnAction increaseDrawBy4 = new TurnAction(drawNCards, storedData, TurnActionFactory::increaseDrawCountBy4, "Increase N (drawCount) by 4");
+        TurnAction playCardAsResponse = new TurnAction(null, storedData, TurnActionFactory::playCardAsActionFromData, "Stack +4 on Previous (Recursive)");
         TurnDecisionAction isChainingCard = new TurnDecisionAction(increaseDrawBy4, playCardAsResponse,
-                -1, "isChaining", storedData, null);
-        TurnAction drawNCardsAndDoNothing = new TurnAction(null, storedData, TurnActionFactory::drawNCards);
-        TurnAction moveBackToNext = new TurnAction(drawNCardsAndDoNothing, storedData, TurnActionFactory::moveNextTurn);
-        TurnAction applyPenalty = new TurnAction(moveBackToNext, storedData, TurnActionFactory::draw4ChallengeSuccess);
-        TurnAction moveToPreviousPlayer = new TurnAction(applyPenalty, storedData, TurnActionFactory::movePrevious);
-        TurnAction increaseDrawBy2 = new TurnAction(increaseDrawBy4, storedData, TurnActionFactory::increaseDrawCountBy2);
+                -1, "isChaining", storedData, null, "No Action");
+        TurnAction drawNCardsAndDoNothing = new TurnAction(null, storedData, TurnActionFactory::drawNCards, "Draw N Number Cards");
+        TurnAction moveBackToNext = new TurnAction(drawNCardsAndDoNothing, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
+        TurnAction applyPenalty = new TurnAction(moveBackToNext, storedData, TurnActionFactory::draw4ChallengeSuccess, "Apply penalty (+4) to Player");
+        TurnAction moveToPreviousPlayer = new TurnAction(applyPenalty, storedData, TurnActionFactory::movePrevious, "Move to Previous Player");
+        TurnAction increaseDrawBy2 = new TurnAction(increaseDrawBy4, storedData, TurnActionFactory::increaseDrawCountBy2, "Increase N (drawCount) by 2");
         TurnDecisionAction couldPreviousPlayCard = new TurnDecisionAction(increaseDrawBy2, moveToPreviousPlayer,
-                -1, "couldPreviousPlayCard", storedData, null);
+                -1, "couldPreviousPlayCard", storedData, null, "Could the Previous Player Have played a Card? (No Action)");
         TurnDecisionAction isChallenging = new TurnDecisionAction(isChainingCard, couldPreviousPlayCard, 25,
-                "", storedData, TurnActionFactory::beginChallengeChoice);
-        TurnAction moveToNextTurn = new TurnAction(isChallenging, storedData, TurnActionFactory::moveNextTurn);
-        TurnAction setTopOfPileColour = new TurnAction(moveToNextTurn, storedData, TurnActionFactory::setTopPileColour);
+                "", storedData, TurnActionFactory::beginChallengeChoice, "Ask if the player wants to Challenge, Stack, or Do Nothing");
+        TurnAction moveToNextTurn = new TurnAction(isChallenging, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
+        TurnAction setTopOfPileColour = new TurnAction(moveToNextTurn, storedData, TurnActionFactory::setTopPileColour, "Change the Colour on Top of Pile");
         TurnDecisionAction chooseWildColour = new TurnDecisionAction(setTopOfPileColour, setTopOfPileColour,
-                25, "wildColour", storedData, TurnActionFactory::beginWildSelection);
-        TurnAction checkCouldPlayCard = new TurnAction(chooseWildColour, storedData, TurnActionFactory::checkCouldPlayCard);
+                25, "wildColour", storedData, TurnActionFactory::beginWildSelection, "Ask player for a Colour Choice");
+        TurnAction checkCouldPlayCard = new TurnAction(chooseWildColour, storedData, TurnActionFactory::checkCouldPlayCard, "Check if a Card Could have been Played");
         return checkCouldPlayCard;
     }
 
     private static TurnAction playWildAction(Map<String, Integer> storedData) {
-        TurnAction moveToNextTurn = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn);
-        TurnAction setTopOfPileColour = new TurnAction(moveToNextTurn, storedData, TurnActionFactory::setTopPileColour);
+        TurnAction moveToNextTurn = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
+        TurnAction setTopOfPileColour = new TurnAction(moveToNextTurn, storedData, TurnActionFactory::setTopPileColour, "Change the Colour on Top of Pile");
         TurnDecisionAction chooseWildColour = new TurnDecisionAction(setTopOfPileColour, setTopOfPileColour,
-                25, "wildColour", storedData, TurnActionFactory::beginWildSelection);
+                25, "wildColour", storedData, TurnActionFactory::beginWildSelection, "Ask player for a Colour Choice");
         return chooseWildColour;
     }
 
     private static TurnAction playSkipAction(Map<String, Integer> storedData) {
-        TurnAction moveToNextTurnAtEnd = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn);
-        TurnAction showSkip = new TurnAction(moveToNextTurnAtEnd, storedData, TurnActionFactory::showSkip);
-        TurnAction moveToNextTurnAtStart = new TurnAction(showSkip, storedData, TurnActionFactory::moveNextTurn);
+        TurnAction moveToNextTurnAtEnd = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
+        TurnAction showSkip = new TurnAction(moveToNextTurnAtEnd, storedData, TurnActionFactory::showSkip, "Show a Skip Icon Over Player");
+        TurnAction moveToNextTurnAtStart = new TurnAction(showSkip, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
         return moveToNextTurnAtStart;
     }
 
     private static TurnAction playReverseAction(Map<String, Integer> storedData) {
-        TurnAction moveToNextTurn = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn);
-        TurnAction swapDirection = new TurnAction(moveToNextTurn, storedData, TurnActionFactory::togglePlayDirection);
+        TurnAction moveToNextTurn = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
+        TurnAction swapDirection = new TurnAction(moveToNextTurn, storedData, TurnActionFactory::togglePlayDirection, "Toggle Direction of Play");
         return swapDirection;
     }
 
@@ -255,7 +289,7 @@ public class TurnActionFactory {
             case Reverse -> playReverseAction(storedData);
             case Swap -> playSwapAction(storedData);
             case PassAll -> playPassAllAction(storedData);
-            default -> new TurnAction(null, storedData, TurnActionFactory::moveNextTurn);
+            case Nothing -> new TurnAction(null, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
         };
     }
 
