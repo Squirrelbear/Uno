@@ -190,15 +190,18 @@ public class TurnActionFactory {
     }
 
     private static TurnAction playPlus4Action(Map<String, Integer> storedData) {
-        TurnAction drawNCards = new TurnAction(null, storedData, TurnActionFactory::drawNCards);
+        TurnAction moveToNextSkipDamagedPlayer = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn);
+        TurnAction drawNCards = new TurnAction(moveToNextSkipDamagedPlayer, storedData, TurnActionFactory::drawNCards);
         TurnAction increaseDrawBy4 = new TurnAction(drawNCards, storedData, TurnActionFactory::increaseDrawCountBy4);
         TurnAction playCardAsResponse = new TurnAction(null, storedData, TurnActionFactory::drawCardAsActionFromData);
         TurnDecisionAction isChainingCard = new TurnDecisionAction(increaseDrawBy4, playCardAsResponse,
                 -1, "isChaining", storedData, null);
-        TurnAction moveBackToNext = new TurnAction(drawNCards, storedData, TurnActionFactory::moveNextTurn);
-        TurnAction applyPenalty = new TurnAction(moveBackToNext, storedData, TurnActionFactory::drawPenalty);
+        TurnAction drawNCardsAndDoNothing = new TurnAction(null, storedData, TurnActionFactory::drawNCards);
+        TurnAction moveBackToNext = new TurnAction(drawNCardsAndDoNothing, storedData, TurnActionFactory::moveNextTurn);
+        TurnAction applyPenalty = new TurnAction(moveBackToNext, storedData, TurnActionFactory::draw4ChallengeSuccess);
         TurnAction moveToPreviousPlayer = new TurnAction(applyPenalty, storedData, TurnActionFactory::movePrevious);
-        TurnDecisionAction couldPreviousPlayCard = new TurnDecisionAction(increaseDrawBy4, moveToPreviousPlayer,
+        TurnAction increaseDrawBy2 = new TurnAction(increaseDrawBy4, storedData, TurnActionFactory::increaseDrawCountBy2);
+        TurnDecisionAction couldPreviousPlayCard = new TurnDecisionAction(increaseDrawBy2, moveToPreviousPlayer,
                 -1, "couldPreviousPlayCard", storedData, null);
         TurnDecisionAction isChallenging = new TurnDecisionAction(isChainingCard, couldPreviousPlayCard, 25,
                 "", storedData, TurnActionFactory::beginChallengeChoice);
@@ -345,8 +348,8 @@ public class TurnActionFactory {
         // couldPreviousPlayCard
     }
 
-    private static void drawPenalty(Map<String, Integer> storedData) {
-        for(int i = 0; i < 6; i++) {
+    private static void draw4ChallengeSuccess(Map<String, Integer> storedData) {
+        for(int i = 0; i < 4; i++) {
             drawCard(storedData);
         }
     }
