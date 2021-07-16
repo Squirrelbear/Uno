@@ -1,6 +1,6 @@
 import java.awt.*;
 
-public class StatusOverlay extends WndInterface {
+public class StatusOverlay extends WndInterface implements TurnActionOverlay {
     /**
      * Initialise the interface with bounds and make it enabled.
      *
@@ -8,6 +8,7 @@ public class StatusOverlay extends WndInterface {
      */
     public StatusOverlay(Rectangle bounds) {
         super(bounds);
+        setEnabled(false);
     }
 
     @Override
@@ -18,5 +19,10 @@ public class StatusOverlay extends WndInterface {
     @Override
     public void paint(Graphics g) {
 
+    }
+
+    @Override
+    public void showOverlay(TurnActionFactory.TurnAction currentAction) {
+        
     }
 }

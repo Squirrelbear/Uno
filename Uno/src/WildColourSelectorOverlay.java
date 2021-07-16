@@ -1,12 +1,13 @@
 import java.awt.*;
 
-public class WildColourSelectorOverlay extends WndInterface {
+public class WildColourSelectorOverlay extends WndInterface implements TurnActionOverlay {
 
     private int hoveredRegion, hoverX, hoverY;
-    private boolean isEnabled;
+    private TurnActionFactory.TurnAction controllingTurnAction;
 
     public WildColourSelectorOverlay(Position position, int width, int height) {
         super(new Rectangle(position, width, height));
+        setEnabled(false);
     }
 
     @Override
@@ -55,11 +56,8 @@ public class WildColourSelectorOverlay extends WndInterface {
         return hoveredRegion;
     }
 
-    public void setEnabled(boolean isEnabled) {
-        this.isEnabled = isEnabled;
-    }
+    @Override
+    public void showOverlay(TurnActionFactory.TurnAction currentAction) {
 
-    public boolean isEnabled() {
-        return isEnabled;
     }
 }

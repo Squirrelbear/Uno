@@ -1,6 +1,6 @@
 import java.awt.*;
 
-public class PlayerSelectionOverlay extends WndInterface {
+public class PlayerSelectionOverlay extends WndInterface implements TurnActionOverlay {
     /**
      * Initialise the interface with bounds and make it enabled.
      *
@@ -8,6 +8,7 @@ public class PlayerSelectionOverlay extends WndInterface {
      */
     public PlayerSelectionOverlay(Rectangle bounds) {
         super(bounds);
+        setEnabled(false);
     }
 
     @Override
@@ -17,6 +18,11 @@ public class PlayerSelectionOverlay extends WndInterface {
 
     @Override
     public void paint(Graphics g) {
+
+    }
+
+    @Override
+    public void showOverlay(TurnActionFactory.TurnAction currentAction) {
 
     }
 }
