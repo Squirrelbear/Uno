@@ -14,6 +14,9 @@ public class CurrentGameInterface extends WndInterface {
     private int curColourID;
     private Player bottomPlayer;
     private WildColourSelectorOverlay wildColourSelectorOverlay;
+    private KeepOrPlayOverlay keepOrPlayOverlay;
+    private PlayerSelectionOverlay playerSelectionOverlay;
+    private StatusOverlay statusOverlay;
     private UnoButton unoButton;
     private final List<Player> players;
     private int currentPlayerID;
@@ -23,10 +26,6 @@ public class CurrentGameInterface extends WndInterface {
     private RuleSet ruleSet;
     private static CurrentGameInterface activeSingleton;
     public static CurrentGameInterface getCurrentGame() {
-        if(activeSingleton == null) {
-            System.out.println("???");
-        }
-
         return activeSingleton;
     }
 
@@ -42,6 +41,9 @@ public class CurrentGameInterface extends WndInterface {
         recentCards = new ArrayList<>();
         centredCardPos = new Position(bounds.position.x+bounds.width/2-30,bounds.position.y+bounds.height/2-45);
         wildColourSelectorOverlay = new WildColourSelectorOverlay(new Position(bounds.width/2-100,bounds.height/2-100),200,200);
+        keepOrPlayOverlay = new KeepOrPlayOverlay(new Rectangle(new Position(0,0), bounds.width, bounds.height));
+        playerSelectionOverlay = new PlayerSelectionOverlay(new Rectangle(new Position(0,0), bounds.width, bounds.height));
+        statusOverlay = new StatusOverlay(new Rectangle(new Position(0,0), bounds.width, bounds.height));
         forcePlayCard(deck.drawCard());
         //createPlayers(Player.PlayerType.ThisPlayer, Player.PlayerType.AIPlayer);
         createPlayers(Player.PlayerType.ThisPlayer, Player.PlayerType.AIPlayer, Player.PlayerType.AIPlayer, Player.PlayerType.AIPlayer);
@@ -75,6 +77,12 @@ public class CurrentGameInterface extends WndInterface {
         bottomPlayer.paint(g);
         if(wildColourSelectorOverlay.isEnabled()) {
             wildColourSelectorOverlay.paint(g);
+        } else if(keepOrPlayOverlay.isEnabled()) {
+            keepOrPlayOverlay.paint(g);
+        } else if(playerSelectionOverlay.isEnabled()) {
+            playerSelectionOverlay.paint(g);
+        } else if(statusOverlay.isEnabled()) {
+            statusOverlay.paint(g);
         }
         unoButton.paint(g);
 
@@ -90,20 +98,26 @@ public class CurrentGameInterface extends WndInterface {
     public void handleMousePress(Position mousePosition, boolean isLeft) {
         if(!isEnabled()) return;
 
-        if(deck.isPositionInside(mousePosition)) {
+        if(wildColourSelectorOverlay.isEnabled()) {
+            int colourID = wildColourSelectorOverlay.getColourFromClick(mousePosition);
+            if(colourID != -1) {
+                wildColourSelectorOverlay.setEnabled(false);
+                curColourID = colourID;
+                recentCards.get(recentCards.size()-1).setColour(colourID);
+            }
+        } else if(keepOrPlayOverlay.isEnabled()) {
+
+
+        } else if(playerSelectionOverlay.isEnabled()) {
+
+
+        } else if(deck.isPositionInside(mousePosition)) {
             if(isLeft) {
                 players.get(currentPlayerID).addCardToHand(deck.drawCard());
                 System.out.println(Arrays.toString(bottomPlayer.getValidMoves(curFaceValue, curColourID).stream().map(card -> card.getFaceValueID() + " " + card.getColourID()).toArray()));
                 moveToNextPlayer();
             } else {
                 forcePlayCard(deck.drawCard());
-            }
-        } else if(wildColourSelectorOverlay.isEnabled()) {
-            int colourID = wildColourSelectorOverlay.getColourFromClick(mousePosition);
-            if(colourID != -1) {
-                wildColourSelectorOverlay.setEnabled(false);
-                curColourID = colourID;
-                recentCards.get(recentCards.size()-1).setColour(colourID);
             }
         } else {
             Card cardToPlay = bottomPlayer.chooseCardFromClick(mousePosition);
@@ -164,6 +178,10 @@ public class CurrentGameInterface extends WndInterface {
         }
     }
 
+    public boolean isIncreasing() {
+        return isIncreasing;
+    }
+
     public void forcePlayCard(Card card) {
         if(card.getFaceValueID() >= 13) {
             playWildCard(card, (int)(Math.random()*4));
@@ -173,6 +191,13 @@ public class CurrentGameInterface extends WndInterface {
     }
 
     public void playCard(Card card) {
+        placeCard(card);
+        if(curColourID == 4) {
+            wildColourSelectorOverlay.setEnabled(true);
+        }
+    }
+
+    public void placeCard(Card card) {
         card.position.setPosition(centredCardPos.x, centredCardPos.y);
         card.position.add(new Position((int)(Math.random()*24-12),(int)(Math.random()*24-12)));
         recentCards.add(card);
@@ -181,9 +206,6 @@ public class CurrentGameInterface extends WndInterface {
         }
         curColourID = card.getColourID();
         curFaceValue = card.getFaceValueID();
-        if(curColourID == 4) {
-            wildColourSelectorOverlay.setEnabled(true);
-        }
     }
 
     public void playWildCard(Card card, int choice) {
@@ -195,6 +217,26 @@ public class CurrentGameInterface extends WndInterface {
 
     public RuleSet getRuleSet() {
         return ruleSet;
+    }
+
+    public Player getCurrentPlayer() {
+        return players.get(currentPlayerID);
+    }
+
+    public List<Player> getAllPlayers() {
+        return players;
+    }
+
+    public Player getPlayerByID(int playerID) {
+        return players.get(playerID);
+    }
+
+    public Deck getDeck() {
+        return deck;
+    }
+
+    public List<Card> getRecentCards() {
+        return recentCards;
     }
 
     private void createPlayers(Player.PlayerType ... playerTypes) {

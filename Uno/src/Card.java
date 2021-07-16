@@ -12,13 +12,15 @@ public class Card extends Rectangle {
     private final int colourID;
     private final int faceValueID;
     private Color drawColour;
+    private final int cardID;
 
-    public Card(Position position, int faceValueID, int colourID) {
-        super(position, CARD_WIDTH, CARD_HEIGHT);
+    public Card(int faceValueID, int colourID, int cardID) {
+        super(new Position(0,0), CARD_WIDTH, CARD_HEIGHT);
         this.faceValueID = faceValueID;
         this.cardLabel = cardFaceValues[faceValueID];
         this.colourID = colourID;
         this.drawColour = getColourByID(colourID);
+        this.cardID = cardID;
         if(faceValueID == 10) {
             this.cornerLabel = "+2";
         } else if(faceValueID == 13) {
@@ -107,6 +109,10 @@ public class Card extends Rectangle {
 
     public int getFaceValueID() {
         return faceValueID;
+    }
+
+    public int getCardID() {
+        return cardID;
     }
 
     public static Color getColourByID(int colourID) {

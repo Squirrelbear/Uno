@@ -77,7 +77,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         } else if(keyCode == KeyEvent.VK_T) {
             activeGame.toggleTurnDirection();
         } else if(keyCode == KeyEvent.VK_D) {
-            TurnActionFactory.TurnAction turnAction = TurnActionFactory.playCardAsAction(1,14);
+            TurnActionFactory.TurnAction turnAction = TurnActionFactory.playCardAsAction(1, 1,14,1);
             TurnActionFactory.debugOutputTurnActionTree(turnAction);
         }
         repaint();

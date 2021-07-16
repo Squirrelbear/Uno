@@ -87,6 +87,15 @@ public class Player {
         recalculateCardPositions();
     }
 
+    public Card getCardByID(int cardID) {
+        for(Card card : hand) {
+            if(card.getCardID() == cardID) {
+                return card;
+            }
+        }
+        return null;
+    }
+
     public Card chooseCardFromClick(Position mousePosition) {
         updateHover(mousePosition);
         return hoveredCard;

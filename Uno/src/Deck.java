@@ -5,10 +5,12 @@ import java.util.List;
 
 public class Deck extends Rectangle {
     private List<Card> deck;
+    private int nextCardID;
 
     public Deck(Position position) {
         super(position, Card.CARD_WIDTH, Card.CARD_HEIGHT);
         deck = new ArrayList<>();
+        nextCardID = 0;
     }
 
     public void paint(Graphics g) {
@@ -33,17 +35,17 @@ public class Deck extends Rectangle {
         // for each colour
         for(int colourID = 0; colourID < 4; colourID++) {
             // Only 1x"0"
-            deck.add(new Card(new Position(position), 0, colourID));
+            deck.add(new Card(0, colourID, nextCardID++));
             // Two of 1 to 9, Draw Two, Skip, and Reverse
             for(int faceValue = 1; faceValue <= 12; faceValue++) {
-                deck.add(new Card(new Position(position), faceValue, colourID));
-                deck.add(new Card(new Position(position), faceValue, colourID));
+                deck.add(new Card(faceValue, colourID, nextCardID++));
+                deck.add(new Card(faceValue, colourID, nextCardID++));
             }
         }
         // Four of each Wild and Draw 4 Wild.
         for(int i = 0; i < 4; i++) {
-            deck.add(new Card(new Position(position), 13, 4));
-            deck.add(new Card(new Position(position), 14, 4));
+            deck.add(new Card(13, 4, nextCardID++));
+            deck.add(new Card(14, 4, nextCardID++));
         }
         System.out.println(deck.size());
         // randomise order

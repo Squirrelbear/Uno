@@ -85,7 +85,9 @@
 
  */
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -124,7 +126,7 @@ public class TurnActionFactory {
     }
 
     public static class TurnDecisionAction extends TurnAction {
-        private int timeOut;
+        private boolean timeOut;
         private TurnAction otherNext;
         private String flagName;
 
@@ -136,7 +138,7 @@ public class TurnActionFactory {
             this.flagName = flagName;
         }*/
 
-        public TurnDecisionAction(TurnAction next, TurnAction otherNext, int timeOut, String flagName,
+        public TurnDecisionAction(TurnAction next, TurnAction otherNext, boolean timeOut, String flagName,
                                   Map<String, Integer> storedData, Consumer<Map<String, Integer>> action, String actionDebugText) {
             super(next, storedData, action, actionDebugText);
             this.otherNext = otherNext;
@@ -157,11 +159,13 @@ public class TurnActionFactory {
         }
     }
 
-    public static TurnAction playCardAsAction(int playerID, int cardID) {
+    public static TurnAction playCardAsAction(int playerID, int cardID, int faceValueID, int colourID) {
         Map<String, Integer> storedData = new HashMap<>();
         storedData.put("playerID", playerID);
         storedData.put("cardID", cardID);
-        TurnAction nextSequence = cardIDToTurnAction(cardID, storedData);
+        storedData.put("faceValueID", faceValueID);
+        storedData.put("colourID", colourID);
+        TurnAction nextSequence = cardIDToTurnAction(faceValueID, storedData);
         return new TurnAction(nextSequence, storedData, TurnActionFactory::placeCard, "Place Card");
     }
 
@@ -174,7 +178,7 @@ public class TurnActionFactory {
         if(currentNode instanceof TurnDecisionAction) {
             TurnDecisionAction currentSplitNode = (TurnDecisionAction) currentNode;
             System.out.println("\t".repeat(indentLevel) + "? " + (indentLevel+1) + ". " + currentSplitNode.flagName
-                                + " " + currentSplitNode.timeOut + "s " + currentSplitNode.actionDebugText);
+                                + " Timeout: " + currentSplitNode.timeOut + " " + currentSplitNode.actionDebugText);
             debugRecursiveNodeOutput(currentSplitNode.next,indentLevel+1);
             if(currentSplitNode.next != currentSplitNode.otherNext) {
                 debugRecursiveNodeOutput(currentSplitNode.otherNext, indentLevel + 1);
@@ -190,19 +194,20 @@ public class TurnActionFactory {
         storedData.put("playerID", playerID);
         TurnAction moveToNextTurn = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
         TurnAction playCard = playCardAsActionFromData(storedData);
-        TurnDecisionAction keepOrPlay = new TurnDecisionAction(moveToNextTurn, playCard, 25,
+        TurnDecisionAction keepOrPlay = new TurnDecisionAction(moveToNextTurn, playCard, true,
                 "keepOrPlay", storedData, TurnActionFactory::keepOrPlayChoice, "Keep Or Play Choice");
         TurnAction keepDrawing = new TurnAction(null, storedData, TurnActionFactory::drawCardAsActionFromData, "Draw Another Card (Recursive Tree)");
-        TurnDecisionAction drawTillCanPlay = new TurnDecisionAction(moveToNextTurn,keepDrawing,-1,
+        TurnDecisionAction drawTillCanPlay = new TurnDecisionAction(moveToNextTurn,keepDrawing,false,
                 "drawTillCanPlay?", storedData, TurnActionFactory::checkDrawTillCanPlayRule, "Check Draw Till Can Play Rule");
-        TurnDecisionAction canPlayCard = new TurnDecisionAction(drawTillCanPlay, keepOrPlay, -1,
+        TurnDecisionAction canPlayCard = new TurnDecisionAction(drawTillCanPlay, keepOrPlay, false,
                 "cardPlayable", storedData, TurnActionFactory::isCardPlayable, "Check is the Card Playable");
         TurnAction drawCard = new TurnAction(canPlayCard, storedData, TurnActionFactory::drawCard, "Draw a Card");
         return drawCard;
     }
 
     private static TurnAction playCardAsActionFromData(Map<String, Integer> storedData) {
-        TurnAction playCard = playCardAsAction(storedData.get("playerID"), storedData.get("cardID"));
+        TurnAction playCard = playCardAsAction(storedData.get("playerID"), storedData.get("cardID"),
+                storedData.get("faceValueID"), storedData.get("colourID"));
         playCard.injectProperty("drawCount", storedData.get("drawCount"));
         return playCard;
     }
@@ -215,9 +220,9 @@ public class TurnActionFactory {
         TurnAction moveToNextTurn = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
         TurnAction dealPenalty = new TurnAction(moveToNextTurn, storedData, TurnActionFactory::drawNCards, "Draw N Number Cards");
         TurnAction playCard = playCardAsActionFromData(storedData);
-        TurnDecisionAction waitForPlay2OrCancel = new TurnDecisionAction(dealPenalty,playCard, 25,
+        TurnDecisionAction waitForPlay2OrCancel = new TurnDecisionAction(dealPenalty,playCard, true,
                 "playCard", storedData, TurnActionFactory::checkForPlay2OrCancel, "Check for +2 or Cancel Choice");
-        TurnDecisionAction checkCanRespond = new TurnDecisionAction(dealPenalty, waitForPlay2OrCancel, -1,
+        TurnDecisionAction checkCanRespond = new TurnDecisionAction(dealPenalty, waitForPlay2OrCancel, false,
                 "hasPlus2AndResponseAllowed", storedData, TurnActionFactory::hasPlus2AndResponseAllowed, "Can Stack and has a +2");
         TurnAction increaseDrawCount = new TurnAction(checkCanRespond, storedData, TurnActionFactory::increaseDrawCountBy2, "Increase N (drawCount) by 2");
         return new TurnAction(increaseDrawCount, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
@@ -229,20 +234,20 @@ public class TurnActionFactory {
         TurnAction increaseDrawBy4 = new TurnAction(drawNCards, storedData, TurnActionFactory::increaseDrawCountBy4, "Increase N (drawCount) by 4");
         TurnAction playCardAsResponse = new TurnAction(null, storedData, TurnActionFactory::playCardAsActionFromData, "Stack +4 on Previous (Recursive)");
         TurnDecisionAction isChainingCard = new TurnDecisionAction(increaseDrawBy4, playCardAsResponse,
-                -1, "isChaining", storedData, null, "No Action");
+                false, "isChaining", storedData, null, "No Action");
         TurnAction drawNCardsAndDoNothing = new TurnAction(null, storedData, TurnActionFactory::drawNCards, "Draw N Number Cards");
         TurnAction moveBackToNext = new TurnAction(drawNCardsAndDoNothing, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
         TurnAction applyPenalty = new TurnAction(moveBackToNext, storedData, TurnActionFactory::draw4ChallengeSuccess, "Apply penalty (+4) to Player");
         TurnAction moveToPreviousPlayer = new TurnAction(applyPenalty, storedData, TurnActionFactory::movePrevious, "Move to Previous Player");
         TurnAction increaseDrawBy2 = new TurnAction(increaseDrawBy4, storedData, TurnActionFactory::increaseDrawCountBy2, "Increase N (drawCount) by 2");
         TurnDecisionAction couldPreviousPlayCard = new TurnDecisionAction(increaseDrawBy2, moveToPreviousPlayer,
-                -1, "couldPreviousPlayCard", storedData, null, "Could the Previous Player Have played a Card? (No Action)");
-        TurnDecisionAction isChallenging = new TurnDecisionAction(isChainingCard, couldPreviousPlayCard, 25,
+                false, "couldPreviousPlayCard", storedData, null, "Could the Previous Player Have played a Card? (No Action)");
+        TurnDecisionAction isChallenging = new TurnDecisionAction(isChainingCard, couldPreviousPlayCard, true,
                 "", storedData, TurnActionFactory::beginChallengeChoice, "Ask if the player wants to Challenge, Stack, or Do Nothing");
         TurnAction moveToNextTurn = new TurnAction(isChallenging, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
         TurnAction setTopOfPileColour = new TurnAction(moveToNextTurn, storedData, TurnActionFactory::setTopPileColour, "Change the Colour on Top of Pile");
         TurnDecisionAction chooseWildColour = new TurnDecisionAction(setTopOfPileColour, setTopOfPileColour,
-                25, "wildColour", storedData, TurnActionFactory::beginWildSelection, "Ask player for a Colour Choice");
+                true, "wildColour", storedData, TurnActionFactory::beginWildSelection, "Ask player for a Colour Choice");
         TurnAction checkCouldPlayCard = new TurnAction(chooseWildColour, storedData, TurnActionFactory::checkCouldPlayCard, "Check if a Card Could have been Played");
         return checkCouldPlayCard;
     }
@@ -251,7 +256,7 @@ public class TurnActionFactory {
         TurnAction moveToNextTurn = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
         TurnAction setTopOfPileColour = new TurnAction(moveToNextTurn, storedData, TurnActionFactory::setTopPileColour, "Change the Colour on Top of Pile");
         TurnDecisionAction chooseWildColour = new TurnDecisionAction(setTopOfPileColour, setTopOfPileColour,
-                25, "wildColour", storedData, TurnActionFactory::beginWildSelection, "Ask player for a Colour Choice");
+                true, "wildColour", storedData, TurnActionFactory::beginWildSelection, "Ask player for a Colour Choice");
         return chooseWildColour;
     }
 
@@ -269,19 +274,21 @@ public class TurnActionFactory {
     }
 
     private static TurnAction playSwapAction(Map<String, Integer> storedData) {
-        // TODO
-
-        return null;
+        TurnAction moveToNextTurn = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
+        TurnAction swapHands = new TurnAction(moveToNextTurn, storedData, TurnActionFactory::swapHandWithOther, "Swap Hands with Selected Player");
+        TurnDecisionAction choosePlayerToSwapWith = new TurnDecisionAction(swapHands,swapHands,true,
+                "otherPlayer",storedData,TurnActionFactory::beginChoosePlayerToSwapWith, "Choose Other Player to Swap With");
+        return choosePlayerToSwapWith;
     }
 
     private static TurnAction playPassAllAction(Map<String, Integer> storedData) {
-
-
-        return null;
+        TurnAction moveToNextTurn = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
+        TurnAction passAllHands = new TurnAction(moveToNextTurn, storedData, TurnActionFactory::passAllHands, "Pass All Hands");
+        return passAllHands;
     }
 
-    private static TurnAction cardIDToTurnAction(int cardID, Map<String, Integer> storedData) {
-        return switch (CurrentGameInterface.getCurrentGame().getRuleSet().getActionForCard(cardID)) {
+    private static TurnAction cardIDToTurnAction(int faceValueID, Map<String, Integer> storedData) {
+        return switch (CurrentGameInterface.getCurrentGame().getRuleSet().getActionForCard(faceValueID)) {
             case Plus2 -> playPlus2Action(storedData);
             case Plus4 -> playPlus4Action(storedData);
             case Wild -> playWildAction(storedData);
@@ -294,22 +301,29 @@ public class TurnActionFactory {
     }
 
     private static void drawCard(Map<String, Integer> storedData) {
-        // TODO
         // Draw card from deck
+        Deck deck = CurrentGameInterface.getCurrentGame().getDeck();
+        Card drawnCard = deck.drawCard();
         // store ID into storedData
+        storedData.put("cardID", drawnCard.getCardID());
+        storedData.put("faceValueID", drawnCard.getFaceValueID());
+        storedData.put("colourID", drawnCard.getColourID());
         // Add card to hand
+        CurrentGameInterface.getCurrentGame().getCurrentPlayer().addCardToHand(drawnCard);
     }
 
     private static void placeCard(Map<String, Integer> storedData) {
-        // TODO
         // Get card from hand
+        Player currentPlayer = CurrentGameInterface.getCurrentGame().getCurrentPlayer();
+        Card cardToPlace = currentPlayer.getCardByID(storedData.get("cardID"));
         // Remove card from hand
+        currentPlayer.removeCard(cardToPlace);
         // Add card to pile
+        CurrentGameInterface.getCurrentGame().placeCard(cardToPlace);
     }
 
     private static void moveNextTurn(Map<String, Integer> storedData) {
-        // TODO
-        // increment player number
+        CurrentGameInterface.getCurrentGame().moveToNextPlayer();
     }
 
     private static void increaseDrawCountBy2(Map<String, Integer> storedData) {
@@ -349,8 +363,8 @@ public class TurnActionFactory {
     }
 
     private static void checkDrawTillCanPlayRule(Map<String, Integer> storedData) {
-        // TODO
-        storedData.put("drawTillCanPlay?", 1);
+        storedData.put("drawTillCanPlay?",
+                CurrentGameInterface.getCurrentGame().getRuleSet().shouldDrawnTillCanPlay() ? 1 : 0);
     }
 
     private static void hasPlus2AndResponseAllowed(Map<String, Integer> storedData) {
@@ -366,11 +380,12 @@ public class TurnActionFactory {
     }
 
     private static void togglePlayDirection(Map<String, Integer> storedData) {
-        // TODO
+        CurrentGameInterface.getCurrentGame().toggleTurnDirection();
     }
 
     private static void beginWildSelection(Map<String, Integer> storedData) {
         // TODO
+        //CurrentGameInterface.getCurrentGame()
     }
 
     private static void setTopPileColour(Map<String, Integer> storedData) {
@@ -378,8 +393,17 @@ public class TurnActionFactory {
     }
 
     private static void checkCouldPlayCard(Map<String, Integer> storedData) {
-        // TODO
-        // couldPreviousPlayCard
+        List<Card> recentCards = CurrentGameInterface.getCurrentGame().getRecentCards();
+        Card cardBeforeLast = recentCards.get(recentCards.size()-2);
+        List<Card> validMoves = CurrentGameInterface.getCurrentGame().getCurrentPlayer().getValidMoves(
+                cardBeforeLast.getFaceValueID(), cardBeforeLast.getColourID());
+        for(Card card : validMoves) {
+            if(card.getFaceValueID() < 13) {
+                storedData.put("couldPreviousPlayCard",1);
+                return;
+            }
+        }
+        storedData.put("couldPreviousPlayCard",0);
     }
 
     private static void draw4ChallengeSuccess(Map<String, Integer> storedData) {
@@ -395,6 +419,54 @@ public class TurnActionFactory {
     }
 
     private static void beginChallengeChoice(Map<String, Integer> storedData) {
+        // TODO
+    }
 
+    private static void swapHandWithOther(Map<String, Integer> storedData) {
+        int targetPlayerID = storedData.get("otherPlayer");
+        Player targetPlayer = CurrentGameInterface.getCurrentGame().getPlayerByID(targetPlayerID);
+        Card[] targetPlayerHand = (Card[])targetPlayer.getHand().toArray();
+        targetPlayer.emptyHand();
+        Player currentPlayer = CurrentGameInterface.getCurrentGame().getCurrentPlayer();
+        Card[] currentPlayerHand = (Card[])currentPlayer.getHand().toArray();
+        currentPlayer.emptyHand();
+        for(Card card : targetPlayerHand) {
+            currentPlayer.addCardToHand(card);
+        }
+        for(Card card : currentPlayerHand) {
+            targetPlayer.addCardToHand(card);
+        }
+    }
+
+    private static void beginChoosePlayerToSwapWith(Map<String, Integer> storedData) {
+        // TODO
+        // otherPlayer
+    }
+
+    private static void passAllHands(Map<String, Integer> storedData) {
+        List<Card[]> hands = new ArrayList<>();
+        List<Player> players = CurrentGameInterface.getCurrentGame().getAllPlayers();
+        for(Player player : players) {
+            hands.add((Card[])player.getHand().toArray());
+            player.emptyHand();
+        }
+
+        // Shuffle the hands
+        if(CurrentGameInterface.getCurrentGame().isIncreasing()) {
+            Card[] movedHand = hands.get(0);
+            hands.remove(0);
+            hands.add(movedHand);
+        } else {
+            Card[] movedHand = hands.get(hands.size()-1);
+            hands.remove(hands.size()-1);
+            hands.add(0, movedHand);
+        }
+
+        // put all the cards into the hands again
+        for(int playerID = 0; playerID < players.size(); playerID++) {
+            for(Card card : hands.get(playerID)) {
+                players.get(playerID).addCardToHand(card);
+            }
+        }
     }
 }
