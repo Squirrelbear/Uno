@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Player {
     public enum PlayerType { ThisPlayer, AIPlayer, NetworkPlayer}
-    private final int playerNumber;
+    private final int playerID;
     private final String playerName;
     private PlayerType playerType;
     private final Rectangle bounds;
@@ -14,9 +14,9 @@ public class Player {
     private Card hoveredCard;
     private boolean showCards;
 
-    public Player(int playerNumber, String playerName, PlayerType playerType, Rectangle bounds) {
+    public Player(int playerID, String playerName, PlayerType playerType, Rectangle bounds) {
         this.playerName = playerName;
-        this.playerNumber = playerNumber;
+        this.playerID = playerID;
         this.playerType = playerType;
         this.bounds = bounds;
         hand = new ArrayList<>();
@@ -48,12 +48,14 @@ public class Player {
         return playerType;
     }
 
+    public int getPlayerID() {
+        return playerID;
+    }
+
     public List<Card> getValidMoves(int curFaceValue, int curColourValue) {
         List<Card> result = new ArrayList<>();
         for(Card card : hand) {
-            if(//curFaceValue == 13 || curFaceValue == 14
-                     card.getFaceValueID() == curFaceValue
-                    || card.getColourID() == curColourValue
+            if(card.getFaceValueID() == curFaceValue || card.getColourID() == curColourValue
             || card.getFaceValueID() == 13 || card.getFaceValueID() == 14) {
                 result.add(card);
             }

@@ -129,6 +129,7 @@ public class TurnActionFactory {
         protected boolean timeOut;
         protected TurnAction otherNext;
         protected String flagName;
+        protected boolean hasRunOnce;
 
         /*public TurnDecisionAction(TurnAction next, TurnAction otherNext, int timeOut, String flagName,
                                   Map<String, Integer> storedData, Consumer<Map<String, Integer>> action) {
@@ -144,6 +145,7 @@ public class TurnActionFactory {
             this.otherNext = otherNext;
             this.timeOut = timeOut;
             this.flagName = flagName;
+            hasRunOnce = false;
         }
 
         @Override
@@ -152,6 +154,13 @@ public class TurnActionFactory {
                 return (storedData.get(flagName) == 0) ? next : otherNext;
             }
             return this;
+        }
+
+        @Override
+        public void performAction() {
+            if(hasRunOnce) return;
+            hasRunOnce = true;
+            super.performAction();
         }
 
         public void injectFlagProperty(Integer value) {
@@ -195,7 +204,7 @@ public class TurnActionFactory {
         TurnAction moveToNextTurn = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
         TurnAction playCard = new TurnAction(null, storedData, TurnActionFactory::playCardAsActionFromData, "Play the Drawn Card");
         TurnDecisionAction keepOrPlay = new TurnDecisionAction(moveToNextTurn, playCard, true,
-                "keepOrPlay", storedData, TurnActionFactory::keepOrPlayChoice, "Keep Or Play Choice");
+                "keepOrPlay", storedData, TurnActionFactory::beginKeepOrPlayChoice, "Keep Or Play Choice");
         TurnAction keepDrawing = new TurnAction(null, storedData, TurnActionFactory::drawCardAsActionFromData, "Draw Another Card (Recursive Tree)");
         TurnDecisionAction drawTillCanPlay = new TurnDecisionAction(moveToNextTurn,keepDrawing,false,
                 "drawTillCanPlay?", storedData, TurnActionFactory::checkDrawTillCanPlayRule, "Check Draw Till Can Play Rule");
@@ -209,11 +218,14 @@ public class TurnActionFactory {
         TurnAction playCard = playCardAsAction(storedData.get("playerID"), storedData.get("cardID"),
                 storedData.get("faceValueID"), storedData.get("colourID"));
         playCard.injectProperty("drawCount", storedData.get("drawCount"));
+        CurrentGameInterface.getCurrentGame().setCurrentTurnAction(playCard);
         return playCard;
     }
 
     private static TurnAction drawCardAsActionFromData(Map<String, Integer> storedData) {
-        return drawCardAsAction(storedData.get("playerID"));
+        TurnAction drawCardSequence = drawCardAsAction(storedData.get("playerID"));
+        CurrentGameInterface.getCurrentGame().setCurrentTurnAction(drawCardSequence);
+        return drawCardSequence;
     }
 
     private static TurnAction playPlus2Action(Map<String, Integer> storedData) {
@@ -353,13 +365,16 @@ public class TurnActionFactory {
     }
 
     private static void isCardPlayable(Map<String, Integer> storedData) {
-        // TODO
-        // Use card ID to check if it is playable given the current top card
-        storedData.put("cardPlayable", 1);
+        List<Card> recentCards = CurrentGameInterface.getCurrentGame().getRecentCards();
+        Card latestCard = recentCards.get(recentCards.size()-1);
+        boolean isPlayable = storedData.get("faceValueID") == latestCard.getFaceValueID()
+                || storedData.get("colourID") == latestCard.getColourID()
+                || storedData.get("faceValueID") >= 13;
+        storedData.put("cardPlayable", isPlayable ? 1 : 0);
     }
 
-    private static void keepOrPlayChoice(Map<String, Integer> storedData) {
-
+    private static void beginKeepOrPlayChoice(Map<String, Integer> storedData) {
+        CurrentGameInterface.getCurrentGame().showOverlayForTurnAction();
     }
 
     private static void checkDrawTillCanPlayRule(Map<String, Integer> storedData) {
@@ -372,7 +387,7 @@ public class TurnActionFactory {
     }
 
     private static void checkForPlay2OrCancel(Map<String, Integer> storedData) {
-        // TODO
+        CurrentGameInterface.getCurrentGame().showOverlayForTurnAction();
     }
 
     private static void showSkip(Map<String, Integer> storedData) {
@@ -384,12 +399,11 @@ public class TurnActionFactory {
     }
 
     private static void beginWildSelection(Map<String, Integer> storedData) {
-        // TODO
-        //CurrentGameInterface.getCurrentGame()
+        CurrentGameInterface.getCurrentGame().showOverlayForTurnAction();
     }
 
     private static void setTopPileColour(Map<String, Integer> storedData) {
-        // TODO
+        CurrentGameInterface.getCurrentGame().setTopCardColour(storedData.get("colourID"));
     }
 
     private static void checkCouldPlayCard(Map<String, Integer> storedData) {
@@ -419,7 +433,7 @@ public class TurnActionFactory {
     }
 
     private static void beginChallengeChoice(Map<String, Integer> storedData) {
-        // TODO
+        CurrentGameInterface.getCurrentGame().showOverlayForTurnAction();
     }
 
     private static void swapHandWithOther(Map<String, Integer> storedData) {
@@ -439,8 +453,7 @@ public class TurnActionFactory {
     }
 
     private static void beginChoosePlayerToSwapWith(Map<String, Integer> storedData) {
-        // TODO
-        // otherPlayer
+        CurrentGameInterface.getCurrentGame().showOverlayForTurnAction();
     }
 
     private static void passAllHands(Map<String, Integer> storedData) {

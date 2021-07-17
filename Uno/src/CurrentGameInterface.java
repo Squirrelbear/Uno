@@ -15,6 +15,7 @@ public class CurrentGameInterface extends WndInterface {
     private Player bottomPlayer;
     private TurnActionOverlayManager overlayManager;
     private TurnActionFactory.TurnAction currentTurnAction;
+    private TurnActionFactory.TurnAction queuedTurnAction;
 
     private final List<Player> players;
     private int currentPlayerID;
@@ -49,7 +50,7 @@ public class CurrentGameInterface extends WndInterface {
             }
         }
         //player = new Player(0, "Player", Player.PlayerType.AIPlayer, getPlayerRect(1));
-        currentPlayerID = (int) (Math.random()*players.size());
+        currentPlayerID = bottomPlayer.getPlayerID(); //(int) (Math.random()*players.size());
         isIncreasing = true;
         playDirectionAnimation = new PlayDirectionAnimation(new Position(bounds.width/2,bounds.height/2), 120, 5);
 
@@ -63,8 +64,19 @@ public class CurrentGameInterface extends WndInterface {
         playDirectionAnimation.update(deltaTime);
         overlayManager.update(deltaTime);
         if(currentTurnAction != null) {
+            if (currentTurnAction instanceof TurnActionFactory.TurnDecisionAction) {
+                if (!((TurnActionFactory.TurnDecisionAction) currentTurnAction).hasRunOnce) {
+                    System.out.println(currentTurnAction.actionDebugText);
+                }
+            } else {
+                System.out.println(currentTurnAction.actionDebugText);
+            }
             currentTurnAction.performAction();
             currentTurnAction = currentTurnAction.getNext();
+            if(queuedTurnAction != null) {
+                currentTurnAction = queuedTurnAction;
+                queuedTurnAction = null;
+            }
         }
     }
 
@@ -126,6 +138,12 @@ public class CurrentGameInterface extends WndInterface {
         bottomPlayer.updateHover(mousePosition);
     }
 
+    public void showOverlayForTurnAction() {
+        if(currentTurnAction instanceof TurnActionFactory.TurnDecisionAction) {
+            overlayManager.showOverlay((TurnActionFactory.TurnDecisionAction) currentTurnAction);
+        }
+    }
+
     public void revealHands() {
         players.forEach(player -> player.revealHand(true));
     }
@@ -160,6 +178,14 @@ public class CurrentGameInterface extends WndInterface {
     public void setTopCardColour(int colourID) {
         curColourID = colourID;
         recentCards.get(recentCards.size()-1).setColour(colourID);
+    }
+
+    public void setCurrentTurnAction(TurnActionFactory.TurnAction turnAction) {
+        if(currentTurnAction != null) {
+            queuedTurnAction = turnAction;
+        } else {
+            currentTurnAction = turnAction;
+        }
     }
 
     public void forcePlayCard(Card card) {
