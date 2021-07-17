@@ -22,7 +22,12 @@ public class KeepOrPlayOverlay extends WndInterface implements TurnActionOverlay
     }
 
     @Override
-    public void showOverlay(TurnActionFactory.TurnAction currentAction) {
+    public void showOverlay(TurnActionFactory.TurnDecisionAction currentAction) {
+
+    }
+
+    @Override
+    public void hideOverlay() {
 
     }
 }

@@ -39,7 +39,8 @@ public class WildColourSelectorOverlay extends WndInterface implements TurnActio
         g.drawString(message, bounds.position.x+bounds.width/2-strWidth/2, bounds.position.y-5);
     }
 
-    public void updateHover(Position mousePosition) {
+    @Override
+    public void handleMouseMove(Position mousePosition) {
         hoveredRegion = -1;
         if(bounds.isPositionInside(mousePosition)) {
             hoverX = (mousePosition.x - bounds.position.x) / (bounds.width/2);
@@ -52,12 +53,17 @@ public class WildColourSelectorOverlay extends WndInterface implements TurnActio
     }
 
     public int getColourFromClick(Position mousePosition) {
-        updateHover(mousePosition);
+        handleMouseMove(mousePosition);
         return hoveredRegion;
     }
 
     @Override
-    public void showOverlay(TurnActionFactory.TurnAction currentAction) {
+    public void showOverlay(TurnActionFactory.TurnDecisionAction currentAction) {
+
+    }
+
+    @Override
+    public void hideOverlay() {
 
     }
 }

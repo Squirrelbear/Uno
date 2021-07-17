@@ -105,6 +105,10 @@ public class Player {
         return hand;
     }
 
+    public String getPlayerName() {
+        return playerName;
+    }
+
     public int getHandTotalScore() {
         int score = 0;
         for (Card card : hand) {

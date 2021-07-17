@@ -126,9 +126,9 @@ public class TurnActionFactory {
     }
 
     public static class TurnDecisionAction extends TurnAction {
-        private boolean timeOut;
-        private TurnAction otherNext;
-        private String flagName;
+        protected boolean timeOut;
+        protected TurnAction otherNext;
+        protected String flagName;
 
         /*public TurnDecisionAction(TurnAction next, TurnAction otherNext, int timeOut, String flagName,
                                   Map<String, Integer> storedData, Consumer<Map<String, Integer>> action) {
@@ -243,7 +243,7 @@ public class TurnActionFactory {
         TurnDecisionAction couldPreviousPlayCard = new TurnDecisionAction(increaseDrawBy2, moveToPreviousPlayer,
                 false, "couldPreviousPlayCard", storedData, null, "Could the Previous Player Have played a Card? (No Action)");
         TurnDecisionAction isChallenging = new TurnDecisionAction(isChainingCard, couldPreviousPlayCard, true,
-                "", storedData, TurnActionFactory::beginChallengeChoice, "Ask if the player wants to Challenge, Stack, or Do Nothing");
+                "isChallenging", storedData, TurnActionFactory::beginChallengeChoice, "Ask if the player wants to Challenge, Stack, or Do Nothing");
         TurnAction moveToNextTurn = new TurnAction(isChallenging, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
         TurnAction setTopOfPileColour = new TurnAction(moveToNextTurn, storedData, TurnActionFactory::setTopPileColour, "Change the Colour on Top of Pile");
         TurnDecisionAction chooseWildColour = new TurnDecisionAction(setTopOfPileColour, setTopOfPileColour,
