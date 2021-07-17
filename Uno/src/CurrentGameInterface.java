@@ -14,7 +14,8 @@ public class CurrentGameInterface extends WndInterface {
     private int curColourID;
     private Player bottomPlayer;
     private TurnActionOverlayManager overlayManager;
-    private UnoButton unoButton;
+    private TurnActionFactory.TurnAction currentTurnAction;
+
     private final List<Player> players;
     private int currentPlayerID;
     private PlayDirectionAnimation playDirectionAnimation;
@@ -48,19 +49,23 @@ public class CurrentGameInterface extends WndInterface {
             }
         }
         //player = new Player(0, "Player", Player.PlayerType.AIPlayer, getPlayerRect(1));
-        unoButton = new UnoButton(new Position(bounds.position.x + bounds.width - UnoButton.WIDTH-40,
-                bounds.position.y + bounds.height - UnoButton.HEIGHT-40));
         currentPlayerID = (int) (Math.random()*players.size());
         isIncreasing = true;
         playDirectionAnimation = new PlayDirectionAnimation(new Position(bounds.width/2,bounds.height/2), 120, 5);
 
         ruleSet = new RuleSet();
         activeSingleton = this;
+        currentTurnAction = null;
     }
 
     @Override
     public void update(int deltaTime) {
         playDirectionAnimation.update(deltaTime);
+        overlayManager.update(deltaTime);
+        if(currentTurnAction != null) {
+            currentTurnAction.performAction();
+            currentTurnAction = currentTurnAction.getNext();
+        }
     }
 
     @Override
@@ -69,8 +74,7 @@ public class CurrentGameInterface extends WndInterface {
         recentCards.forEach(card -> card.paint(g));
         players.forEach(player -> {if(player.getPlayerType() != Player.PlayerType.ThisPlayer) player.paint(g);});
         bottomPlayer.paint(g);
-
-        unoButton.paint(g);
+        overlayManager.paint(g);
 
         playDirectionAnimation.paint(g);
 
@@ -87,13 +91,14 @@ public class CurrentGameInterface extends WndInterface {
         if(overlayManager.isEnabled()) {
             overlayManager.handleMousePress(mousePosition, isLeft);
         } else if(deck.isPositionInside(mousePosition)) {
-            if(isLeft) {
+            currentTurnAction = TurnActionFactory.drawCardAsAction(currentPlayerID);
+            /*if(isLeft) {
                 players.get(currentPlayerID).addCardToHand(deck.drawCard());
                 System.out.println(Arrays.toString(bottomPlayer.getValidMoves(curFaceValue, curColourID).stream().map(card -> card.getFaceValueID() + " " + card.getColourID()).toArray()));
                 moveToNextPlayer();
             } else {
                 forcePlayCard(deck.drawCard());
-            }
+            }*/
         } else {
             Card cardToPlay = bottomPlayer.chooseCardFromClick(mousePosition);
             if(bottomPlayer.getValidMoves(curFaceValue, curColourID).contains(cardToPlay)) {
@@ -117,13 +122,8 @@ public class CurrentGameInterface extends WndInterface {
     public void handleMouseMove(Position mousePosition) {
         if(!isEnabled()) return;
 
-        if(overlayManager.isEnabled()) {
-            overlayManager.handleMouseMove(mousePosition);
-        } else {
-            unoButton.updateHover(mousePosition);
-            bottomPlayer.updateHover(mousePosition);
-        }
-
+        overlayManager.handleMouseMove(mousePosition);
+        bottomPlayer.updateHover(mousePosition);
     }
 
     public void revealHands() {

@@ -47,7 +47,7 @@ public class Deck extends Rectangle {
             deck.add(new Card(13, 4, nextCardID++));
             deck.add(new Card(14, 4, nextCardID++));
         }
-        System.out.println(deck.size());
+        //System.out.println(deck.size());
         // randomise order
         Collections.shuffle(deck);
     }

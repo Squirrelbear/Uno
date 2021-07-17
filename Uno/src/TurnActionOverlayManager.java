@@ -8,6 +8,7 @@ public class TurnActionOverlayManager extends WndInterface implements TurnAction
     private PlayerSelectionOverlay playerSelectionOverlay;
     private StatusOverlay statusOverlay;
     private List<TurnActionOverlay> overlays;
+    private UnoButton unoButton;
 
     /**
      * Initialise the interface with bounds and make it enabled.
@@ -26,6 +27,9 @@ public class TurnActionOverlayManager extends WndInterface implements TurnAction
         overlays.add(keepOrPlayOverlay);
         overlays.add(playerSelectionOverlay);
         overlays.add(statusOverlay);
+
+        unoButton = new UnoButton(new Position(bounds.position.x + bounds.width - UnoButton.WIDTH-40,
+                bounds.position.y + bounds.height - UnoButton.HEIGHT-40));
     }
 
     @Override
@@ -65,6 +69,9 @@ public class TurnActionOverlayManager extends WndInterface implements TurnAction
                 overlay.paint(g);
             }
         }
+        if(unoButton.isEnabled()) {
+            unoButton.paint(g);
+        }
     }
 
     @Override
@@ -88,6 +95,9 @@ public class TurnActionOverlayManager extends WndInterface implements TurnAction
     public void handleMouseMove(Position mousePosition) {
         if(wildColourSelectorOverlay.isEnabled()) {
             wildColourSelectorOverlay.handleMouseMove(mousePosition);
+        }
+        if(unoButton.isEnabled()) {
+            unoButton.handleMouseMove(mousePosition);
         }
     }
 }

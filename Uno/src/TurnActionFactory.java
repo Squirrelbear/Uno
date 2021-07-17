@@ -193,7 +193,7 @@ public class TurnActionFactory {
         Map<String, Integer> storedData = new HashMap<>();
         storedData.put("playerID", playerID);
         TurnAction moveToNextTurn = new TurnAction(null, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
-        TurnAction playCard = playCardAsActionFromData(storedData);
+        TurnAction playCard = new TurnAction(null, storedData, TurnActionFactory::playCardAsActionFromData, "Play the Drawn Card");
         TurnDecisionAction keepOrPlay = new TurnDecisionAction(moveToNextTurn, playCard, true,
                 "keepOrPlay", storedData, TurnActionFactory::keepOrPlayChoice, "Keep Or Play Choice");
         TurnAction keepDrawing = new TurnAction(null, storedData, TurnActionFactory::drawCardAsActionFromData, "Draw Another Card (Recursive Tree)");
