@@ -233,7 +233,7 @@ public class TurnActionFactory {
         TurnAction dealPenalty = new TurnAction(moveToNextTurn, storedData, TurnActionFactory::drawNCards, "Draw N Number Cards");
         TurnAction playCard = playCardAsActionFromData(storedData);
         TurnDecisionAction waitForPlay2OrCancel = new TurnDecisionAction(dealPenalty,playCard, true,
-                "playCard", storedData, TurnActionFactory::checkForPlay2OrCancel, "Check for +2 or Cancel Choice");
+                "playCard", storedData, TurnActionFactory::beginCheckForPlay2OrCancel, "Check for +2 or Cancel Choice");
         TurnDecisionAction checkCanRespond = new TurnDecisionAction(dealPenalty, waitForPlay2OrCancel, false,
                 "hasPlus2AndResponseAllowed", storedData, TurnActionFactory::hasPlus2AndResponseAllowed, "Can Stack and has a +2");
         TurnAction increaseDrawCount = new TurnAction(checkCanRespond, storedData, TurnActionFactory::increaseDrawCountBy2, "Increase N (drawCount) by 2");
@@ -386,12 +386,13 @@ public class TurnActionFactory {
         // TODO
     }
 
-    private static void checkForPlay2OrCancel(Map<String, Integer> storedData) {
+    private static void beginCheckForPlay2OrCancel(Map<String, Integer> storedData) {
         CurrentGameInterface.getCurrentGame().showOverlayForTurnAction();
     }
 
     private static void showSkip(Map<String, Integer> storedData) {
-        // TODO
+        CurrentGameInterface.getCurrentGame().showGeneralOverlay("SkipVisual"
+                + CurrentGameInterface.getCurrentGame().getCurrentPlayer().getPlayerID());
     }
 
     private static void togglePlayDirection(Map<String, Integer> storedData) {

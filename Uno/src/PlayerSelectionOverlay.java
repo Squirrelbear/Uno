@@ -1,6 +1,6 @@
 import java.awt.*;
 
-public class PlayerSelectionOverlay extends WndInterface implements TurnActionOverlay {
+public class PlayerSelectionOverlay extends WndInterface implements TurnDecisionOverlayInterface {
     /**
      * Initialise the interface with bounds and make it enabled.
      *

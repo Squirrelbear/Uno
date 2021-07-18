@@ -1,6 +1,6 @@
 import java.awt.*;
 
-public class UnoButton extends WndInterface {
+public class UnoButton extends WndInterface implements GeneralOverlayInterface {
     public static final int WIDTH = 80;
     public static final int HEIGHT = 60;
     private boolean isHovered;
@@ -9,6 +9,16 @@ public class UnoButton extends WndInterface {
         super(new Rectangle(position, WIDTH, HEIGHT));
         isHovered = false;
         setEnabled(true);
+    }
+
+    @Override
+    public void showOverlay() {
+
+    }
+
+    @Override
+    public void hideOverlay() {
+
     }
 
     @Override

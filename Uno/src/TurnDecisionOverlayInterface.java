@@ -1,6 +1,6 @@
 import java.awt.*;
 
-public interface TurnActionOverlay {
+public interface TurnDecisionOverlayInterface {
     void showOverlay(TurnActionFactory.TurnDecisionAction currentAction);
     void hideOverlay();
     void setEnabled(boolean isEnabled);

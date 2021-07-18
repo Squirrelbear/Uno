@@ -1,6 +1,6 @@
 import java.awt.*;
 
-public class WildColourSelectorOverlay extends WndInterface implements TurnActionOverlay {
+public class WildColourSelectorOverlay extends WndInterface implements TurnDecisionOverlayInterface {
 
     private int hoveredRegion, hoverX, hoverY;
     private TurnActionFactory.TurnAction controllingTurnAction;
@@ -52,9 +52,13 @@ public class WildColourSelectorOverlay extends WndInterface implements TurnActio
         }
     }
 
-    public int getColourFromClick(Position mousePosition) {
+    @Override
+    public void handleMousePress(Position mousePosition, boolean isLeft) {
         handleMouseMove(mousePosition);
-        return hoveredRegion;
+        if(hoveredRegion != -1) {
+            setEnabled(false);
+            // TODO
+        }
     }
 
     @Override

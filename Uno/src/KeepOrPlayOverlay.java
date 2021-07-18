@@ -1,6 +1,6 @@
 import java.awt.*;
 
-public class KeepOrPlayOverlay extends WndInterface implements TurnActionOverlay {
+public class KeepOrPlayOverlay extends WndInterface implements TurnDecisionOverlayInterface {
     /**
      * Initialise the interface with bounds and make it enabled.
      *

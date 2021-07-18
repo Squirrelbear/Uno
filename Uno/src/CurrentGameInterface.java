@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class CurrentGameInterface extends WndInterface {
@@ -13,7 +12,7 @@ public class CurrentGameInterface extends WndInterface {
     private int curFaceValue;
     private int curColourID;
     private Player bottomPlayer;
-    private TurnActionOverlayManager overlayManager;
+    private OverlayManager overlayManager;
     private TurnActionFactory.TurnAction currentTurnAction;
     private TurnActionFactory.TurnAction queuedTurnAction;
 
@@ -39,7 +38,7 @@ public class CurrentGameInterface extends WndInterface {
         deck = new Deck(new Position(100,100));
         recentCards = new ArrayList<>();
         centredCardPos = new Position(bounds.position.x+bounds.width/2-30,bounds.position.y+bounds.height/2-45);
-        overlayManager = new TurnActionOverlayManager(bounds);
+        overlayManager = new OverlayManager(bounds);
         forcePlayCard(deck.drawCard());
         //createPlayers(Player.PlayerType.ThisPlayer, Player.PlayerType.AIPlayer);
         createPlayers(Player.PlayerType.ThisPlayer, Player.PlayerType.AIPlayer, Player.PlayerType.AIPlayer, Player.PlayerType.AIPlayer);
@@ -140,8 +139,12 @@ public class CurrentGameInterface extends WndInterface {
 
     public void showOverlayForTurnAction() {
         if(currentTurnAction instanceof TurnActionFactory.TurnDecisionAction) {
-            overlayManager.showOverlay((TurnActionFactory.TurnDecisionAction) currentTurnAction);
+            overlayManager.showDecisionOverlay((TurnActionFactory.TurnDecisionAction) currentTurnAction);
         }
+    }
+
+    public void showGeneralOverlay(String overlayName) {
+        overlayManager.showGeneralOverlay(overlayName);
     }
 
     public void revealHands() {

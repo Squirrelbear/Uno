@@ -1,6 +1,6 @@
 import java.awt.*;
 
-public class StatusOverlay extends WndInterface implements TurnActionOverlay {
+public class StatusOverlay extends WndInterface implements TurnDecisionOverlayInterface {
     private TurnActionFactory.TurnDecisionAction currentAction;
     private String statusText;
     private Font statusFont = new Font("Arial", Font.BOLD, 20);
