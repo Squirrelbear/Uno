@@ -119,6 +119,10 @@ public class Player {
         return score;
     }
 
+    public Position getCentreOfBounds() {
+        return bounds.getCentre();
+    }
+
     private void recalculateCardPositions() {
         int paddingX = -15;
         int paddingY = (playerType == PlayerType.ThisPlayer) ? 10 : -Card.CARD_HEIGHT/2-10;

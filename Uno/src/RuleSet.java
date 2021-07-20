@@ -15,8 +15,8 @@ public class RuleSet {
         faceValueToActionMap[10] = CardAction.Plus2;
         faceValueToActionMap[11] = CardAction.Skip;
         faceValueToActionMap[12] = CardAction.Reverse;
-        faceValueToActionMap[13] = CardAction.Wild;
-        faceValueToActionMap[14] = CardAction.Plus4;
+        faceValueToActionMap[13] = CardAction.Plus4;
+        faceValueToActionMap[14] = CardAction.Wild;
         canStackCards = true;
         drawnTillCanPlay = true;
         defaultTimeOut = 25;

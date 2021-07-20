@@ -233,7 +233,7 @@ public class TurnActionFactory {
         TurnAction dealPenalty = new TurnAction(moveToNextTurn, storedData, TurnActionFactory::drawNCards, "Draw N Number Cards");
         TurnAction playCard = playCardAsActionFromData(storedData);
         TurnDecisionAction waitForPlay2OrCancel = new TurnDecisionAction(dealPenalty,playCard, true,
-                "playCard", storedData, TurnActionFactory::beginCheckForPlay2OrCancel, "Check for +2 or Cancel Choice");
+                "isStacking", storedData, TurnActionFactory::beginCheckForPlay2OrCancel, "Check for +2 or Cancel Choice");
         TurnDecisionAction checkCanRespond = new TurnDecisionAction(dealPenalty, waitForPlay2OrCancel, false,
                 "hasPlus2AndResponseAllowed", storedData, TurnActionFactory::hasPlus2AndResponseAllowed, "Can Stack and has a +2");
         TurnAction increaseDrawCount = new TurnAction(checkCanRespond, storedData, TurnActionFactory::increaseDrawCountBy2, "Increase N (drawCount) by 2");
@@ -383,7 +383,12 @@ public class TurnActionFactory {
     }
 
     private static void hasPlus2AndResponseAllowed(Map<String, Integer> storedData) {
-        // TODO
+        if(CurrentGameInterface.getCurrentGame().getRuleSet().canStackCards() &&
+          CurrentGameInterface.getCurrentGame().getCurrentPlayer().getHand().stream().filter(card -> card.getFaceValueID() == 10).count() > 0) {
+            storedData.put("hasPlus2AndResponseAllowed", 1);
+        } else {
+            storedData.put("hasPlus2AndResponseAllowed", 0);
+        }
     }
 
     private static void beginCheckForPlay2OrCancel(Map<String, Integer> storedData) {

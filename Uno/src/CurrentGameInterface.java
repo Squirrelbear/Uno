@@ -34,12 +34,13 @@ public class CurrentGameInterface extends WndInterface {
      */
     public CurrentGameInterface(Rectangle bounds) {
         super(bounds);
+        activeSingleton = this;
         players = new ArrayList<>();
+        ruleSet = new RuleSet();
         deck = new Deck(new Position(100,100));
         recentCards = new ArrayList<>();
         centredCardPos = new Position(bounds.position.x+bounds.width/2-30,bounds.position.y+bounds.height/2-45);
-        overlayManager = new OverlayManager(bounds);
-        forcePlayCard(deck.drawCard());
+
         //createPlayers(Player.PlayerType.ThisPlayer, Player.PlayerType.AIPlayer);
         createPlayers(Player.PlayerType.ThisPlayer, Player.PlayerType.AIPlayer, Player.PlayerType.AIPlayer, Player.PlayerType.AIPlayer);
         bottomPlayer = players.stream().filter(player -> player.getPlayerType() == Player.PlayerType.ThisPlayer).findFirst().get();
@@ -53,8 +54,8 @@ public class CurrentGameInterface extends WndInterface {
         isIncreasing = true;
         playDirectionAnimation = new PlayDirectionAnimation(new Position(bounds.width/2,bounds.height/2), 120, 5);
 
-        ruleSet = new RuleSet();
-        activeSingleton = this;
+        overlayManager = new OverlayManager(bounds, players);
+        forcePlayCard(deck.drawCard());
         currentTurnAction = null;
     }
 
