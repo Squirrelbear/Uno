@@ -9,6 +9,9 @@ import java.util.stream.Collectors;
  * Defines a specific variation of the Player that is handled
  * automatically by AI choosing actions to take during updates
  * with randomised delays to give players time to watch actions as they occur.
+ *
+ * @author Peter Mitchell
+ * @version 2021.1
  */
 public class AIPlayer extends Player {
     /**

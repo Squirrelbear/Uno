@@ -22,6 +22,9 @@ public class TurnActionFactory {
      * TurnAction class:
      * Defines a TurnAction that acts as a linked list of actions.
      * Takes in an action that is expected to be performed once before iterating to a next state.
+     *
+     * @author Peter Mitchell
+     * @version 2021.1
      */
     public static class TurnAction {
         /**
@@ -92,6 +95,9 @@ public class TurnActionFactory {
      * Defines a TurnDecisionAction that acts as a linked list of actions with a split to one
      * of two different options based on the value stored into a flagged variable.
      * Takes in an action that is expected to be performed once before iterating to a next state.
+     *
+     * @author Peter Mitchell
+     * @version 2021.1
      */
     public static class TurnDecisionAction extends TurnAction {
         /**

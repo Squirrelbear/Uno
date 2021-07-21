@@ -1,17 +1,53 @@
 import java.awt.*;
 
+/**
+ * Uno
+ *
+ * Card class:
+ * Defines a Card including its properties and methods for showing appearance of the front and back.
+ *
+ * @author Peter Mitchell
+ * @version 2021.1
+ */
 public class Card extends Rectangle {
+    /**
+     * Constant definition of the width of a card to be used for calculations.
+     */
     public static final int CARD_WIDTH = 60;
+    /**
+     * Constant definition of the height of a card to be used for calculations.
+     */
     public static final int CARD_HEIGHT = 90;
 
+    /**
+     * The Strings to show for each different faceValueID.
+     */
     private static final String[] cardFaceValues = {"0","1","2","3","4","5","6","7","8","9",
                                     "Draw Two", "Skip", "Reverse", "Draw Four", "Wild"};
 
+    /**
+     * The label in the centre of the card.
+     */
     private final String cardLabel;
+    /**
+     * The label in both corners of the card.
+     */
     private final String cornerLabel;
-    private final int colourID;
+    /**
+     * The ID used to determine which of the four colours it is (or 4 if the card is a wild without colour set yet).
+     */
+    private int colourID;
+    /**
+     * The faceValue to represent what type of number or other visual appearance the card has.
+     */
     private final int faceValueID;
+    /**
+     * The colour used for drawing based on the colourID.
+     */
     private Color drawColour;
+    /**
+     * The unique ID based on order drawn from the deck.
+     */
     private final int cardID;
 
     public Card(int faceValueID, int colourID, int cardID) {
@@ -32,6 +68,11 @@ public class Card extends Rectangle {
         }
     }
 
+    /**
+     * Draws the card face up based on properties and type of card.
+     *
+     * @param g Reference to the Graphics object for rendering.
+     */
     public void paint(Graphics g) {
         // Draw card background with white border and card colour
         g.setColor(Color.WHITE);
@@ -81,6 +122,10 @@ public class Card extends Rectangle {
         g.drawString(cornerLabel, position.x+width-strWidth-5, position.y+height-5);
     }
 
+    /**
+     * @param g Reference to the Graphics object for rendering.
+     * @param bounds Bounds to use for drawing the card back.
+     */
     public static void paintCardBack(Graphics g, Rectangle bounds) {
         g.setColor(Color.WHITE);
         g.fillRect(bounds.position.x, bounds.position.y, bounds.width, bounds.height);
@@ -99,7 +144,13 @@ public class Card extends Rectangle {
                 bounds.position.y+bounds.height/2-((bounds.width-8)/4)+20);
     }
 
+    /**
+     * Sets the colour and the colour used to draw.
+     *
+     * @param colourID The colour to set the card to. 0=Red, 1=Blue, 2=Green, 3=Yellow, 4=Wild
+     */
     public void setColour(int colourID) {
+        this.colourID = colourID;
         drawColour = getColourByID(colourID);
     }
 
