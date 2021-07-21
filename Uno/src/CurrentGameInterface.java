@@ -2,6 +2,16 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Uno
+ *
+ * CurrentGameInterface class:
+ * Defines the main game view controlling a list of players and
+ * managing the state of all game elements.
+ *
+ * @author Peter Mitchell
+ * @version 2021.1
+ */
 public class CurrentGameInterface extends WndInterface {
 
     private final Deck deck;
@@ -11,7 +21,7 @@ public class CurrentGameInterface extends WndInterface {
     private final Position centredCardPos;
     private int curFaceValue;
     private int curColourID;
-    private final Player bottomPlayer;
+    private Player bottomPlayer;
     private final OverlayManager overlayManager;
     private TurnActionFactory.TurnAction currentTurnAction;
     private TurnActionFactory.TurnAction queuedTurnAction;
@@ -43,7 +53,6 @@ public class CurrentGameInterface extends WndInterface {
 
         //createPlayers(Player.PlayerType.ThisPlayer, Player.PlayerType.AIPlayer);
         createPlayers(Player.PlayerType.ThisPlayer, Player.PlayerType.AIPlayer, Player.PlayerType.AIPlayer, Player.PlayerType.AIPlayer);
-        bottomPlayer = players.stream().filter(player -> player.getPlayerType() == Player.PlayerType.ThisPlayer).findFirst().get();
         for (Player player : players) {
             for(int i = 0; i < 7; i++) {
                 player.addCardToHand(deck.drawCard());
@@ -278,8 +287,7 @@ public class CurrentGameInterface extends WndInterface {
                 players.add(new Player(i, "Player", playerTypes[i], playerRegion));
             }
         }
-
-
+        bottomPlayer = players.get(thisPlayerIndex);
     }
 
     // direction: 0=bottom, 1=left, 2=top, 3=right
