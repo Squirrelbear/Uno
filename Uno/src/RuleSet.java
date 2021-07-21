@@ -1,3 +1,17 @@
+/*
+    // Flag as unsafe at start of turn with 2 cards
+    Call Uno Action: Make player safe
+    Catch Player Action: MoveToPreviousPlayer -> Alert Caught -> Draw Card * 2 -> MoveToNextPlayer
+
+
+
+    Two Player: Reverse becomes skip
+
+    Progressive Uno: Response Allowed for +2 and +4 enabled
+
+    Seven-O: 7 (Swap Action) 0 (all pass hand to left)
+ */
+
 public class RuleSet {
     public enum CardAction { Nothing, Plus2, Plus4, Wild, Skip, Reverse, Swap, PassAll}
 
