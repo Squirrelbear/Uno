@@ -49,7 +49,7 @@ public class StatusOverlay extends WndInterface implements TurnDecisionOverlayIn
 
     @Override
     public void hideOverlay() {
-
+        setEnabled(false);
     }
 
     private String createContextString(TurnActionFactory.TurnDecisionAction currentAction) {

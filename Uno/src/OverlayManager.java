@@ -6,6 +6,7 @@ import java.util.List;
 public class OverlayManager extends WndInterface {
     private Map<String, TurnDecisionOverlayInterface> decisionOverlays;
     private Map<String, GeneralOverlayInterface> generalOverlays;
+    private TurnActionFactory.TurnDecisionAction overlayAction;
 
     /**
      * Initialise the interface with bounds and make it enabled.
@@ -52,6 +53,7 @@ public class OverlayManager extends WndInterface {
                     overlayToShow.showOverlay(currentAction);
                 }
             }
+            overlayAction = currentAction;
             decisionOverlays.get("statusOverlay").showOverlay(currentAction);
         }
     }
@@ -64,11 +66,19 @@ public class OverlayManager extends WndInterface {
     }
 
     public void hideOverlay() {
-
+        decisionOverlays.forEach((key,overlay) -> {
+            overlay.hideOverlay();
+        });
+        setEnabled(false);
     }
 
     @Override
     public void update(int deltaTime) {
+        if(overlayAction != CurrentGameInterface.getCurrentGame().getCurrentTurnAction()) {
+            overlayAction = null;
+            hideOverlay();
+        }
+
         decisionOverlays.forEach((key,overlay) -> {
             if(overlay.isEnabled()) {
                 overlay.update(deltaTime);

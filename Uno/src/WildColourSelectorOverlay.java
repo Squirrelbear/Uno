@@ -3,7 +3,7 @@ import java.awt.*;
 public class WildColourSelectorOverlay extends WndInterface implements TurnDecisionOverlayInterface {
 
     private int hoveredRegion, hoverX, hoverY;
-    private TurnActionFactory.TurnAction controllingTurnAction;
+    private TurnActionFactory.TurnDecisionAction controllingTurnAction;
 
     public WildColourSelectorOverlay(Position position, int width, int height) {
         super(new Rectangle(position, width, height));
@@ -56,18 +56,20 @@ public class WildColourSelectorOverlay extends WndInterface implements TurnDecis
     public void handleMousePress(Position mousePosition, boolean isLeft) {
         handleMouseMove(mousePosition);
         if(hoveredRegion != -1) {
-            setEnabled(false);
-            // TODO
+            controllingTurnAction.injectProperty("colourID", hoveredRegion);
+            controllingTurnAction.injectFlagProperty(1);
+            hideOverlay();
         }
     }
 
     @Override
     public void showOverlay(TurnActionFactory.TurnDecisionAction currentAction) {
-
+        this.controllingTurnAction = currentAction;
+        setEnabled(true);
     }
 
     @Override
     public void hideOverlay() {
-
+        setEnabled(false);
     }
 }

@@ -12,7 +12,7 @@ public class StackChoiceOverlay extends WndInterface implements TurnDecisionOver
      */
     public StackChoiceOverlay(Rectangle bounds) {
         super(bounds);
-        setEnabled(true);
+        setEnabled(false);
         Position centre = bounds.getCentre();
         declineButton = new Button(new Position(centre.x-50,centre.y+100), 100, 40, "Decline", 0);
 

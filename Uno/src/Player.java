@@ -23,6 +23,10 @@ public class Player {
         showCards = playerType == PlayerType.ThisPlayer;
     }
 
+    public void update(int deltaTime) {
+
+    }
+
     public void paint(Graphics g) {
         if(showCards) {
             hand.forEach(card -> card.paint(g));

@@ -11,17 +11,17 @@ public class CurrentGameInterface extends WndInterface {
     private final Position centredCardPos;
     private int curFaceValue;
     private int curColourID;
-    private Player bottomPlayer;
-    private OverlayManager overlayManager;
+    private final Player bottomPlayer;
+    private final OverlayManager overlayManager;
     private TurnActionFactory.TurnAction currentTurnAction;
     private TurnActionFactory.TurnAction queuedTurnAction;
 
     private final List<Player> players;
     private int currentPlayerID;
-    private PlayDirectionAnimation playDirectionAnimation;
+    private final PlayDirectionAnimation playDirectionAnimation;
     private boolean isIncreasing;
 
-    private RuleSet ruleSet;
+    private final RuleSet ruleSet;
     private static CurrentGameInterface activeSingleton;
     public static CurrentGameInterface getCurrentGame() {
         return activeSingleton;
@@ -78,6 +78,20 @@ public class CurrentGameInterface extends WndInterface {
                 queuedTurnAction = null;
             }
         }
+
+        players.forEach(player -> player.update(deltaTime));
+
+        // TODO
+        if (bottomPlayer.getHand().size() == 0) {
+            int totalScore = 0;
+            for (int i = 0; i < players.size(); i++) {
+                if (players.get(i) != bottomPlayer) {
+                    totalScore += players.get(i).getHandTotalScore();
+                    System.out.println("Player " + i + ": " + players.get(i).getHandTotalScore());
+                }
+            }
+            System.out.println("Total score: " + totalScore);
+        }
     }
 
     @Override
@@ -102,29 +116,15 @@ public class CurrentGameInterface extends WndInterface {
 
         if(overlayManager.isEnabled()) {
             overlayManager.handleMousePress(mousePosition, isLeft);
-        } else if(deck.isPositionInside(mousePosition)) {
-            currentTurnAction = TurnActionFactory.drawCardAsAction(currentPlayerID);
-            /*if(isLeft) {
-                players.get(currentPlayerID).addCardToHand(deck.drawCard());
-                System.out.println(Arrays.toString(bottomPlayer.getValidMoves(curFaceValue, curColourID).stream().map(card -> card.getFaceValueID() + " " + card.getColourID()).toArray()));
-                moveToNextPlayer();
+        }
+
+        if(currentTurnAction == null && currentPlayerID == bottomPlayer.getPlayerID()) {
+            if (deck.isPositionInside(mousePosition)) {
+                currentTurnAction = TurnActionFactory.drawCardAsAction(currentPlayerID);
             } else {
-                forcePlayCard(deck.drawCard());
-            }*/
-        } else {
-            Card cardToPlay = bottomPlayer.chooseCardFromClick(mousePosition);
-            if(bottomPlayer.getValidMoves(curFaceValue, curColourID).contains(cardToPlay)) {
-                playCard(cardToPlay);
-                bottomPlayer.removeCard(cardToPlay);
-                if(bottomPlayer.getHand().size() == 0) {
-                    int totalScore = 0;
-                    for(int i = 0; i < players.size(); i++) {
-                        if(players.get(i) != bottomPlayer) {
-                            totalScore += players.get(i).getHandTotalScore();
-                            System.out.println("Player " + i + ": " + players.get(i).getHandTotalScore());
-                        }
-                    }
-                    System.out.println("Total score: " + totalScore);
+                Card cardToPlay = bottomPlayer.chooseCardFromClick(mousePosition);
+                if (bottomPlayer.getValidMoves(curFaceValue, curColourID).contains(cardToPlay)) {
+                    currentTurnAction = TurnActionFactory.playCardAsAction(currentPlayerID, cardToPlay.getCardID(), cardToPlay.getFaceValueID(), cardToPlay.getColourID());
                 }
             }
         }
@@ -193,17 +193,10 @@ public class CurrentGameInterface extends WndInterface {
     }
 
     public void forcePlayCard(Card card) {
-        if(card.getFaceValueID() >= 13) {
-            playWildCard(card, (int)(Math.random()*4));
-        } else {
-            playCard(card);
-        }
-    }
-
-    public void playCard(Card card) {
         placeCard(card);
-        if(curColourID == 4) {
-            //wildColourSelectorOverlay.setEnabled(true); // TODO
+
+        if(card.getFaceValueID() >= 13) {
+            setTopCardColour((int)(Math.random()*4));
         }
     }
 
@@ -218,11 +211,8 @@ public class CurrentGameInterface extends WndInterface {
         curFaceValue = card.getFaceValueID();
     }
 
-    public void playWildCard(Card card, int choice) {
-        playCard(card);
-        curColourID = choice;
-        card.setColour(choice);
-        //wildColourSelectorOverlay.setEnabled(false); // TODO
+    public TurnActionFactory.TurnAction getCurrentTurnAction() {
+        return currentTurnAction;
     }
 
     public RuleSet getRuleSet() {
@@ -249,6 +239,10 @@ public class CurrentGameInterface extends WndInterface {
         return recentCards;
     }
 
+    public Card getTopCard() {
+        return recentCards.get(recentCards.size()-1);
+    }
+
     private void createPlayers(Player.PlayerType ... playerTypes) {
         if(playerTypes.length != 2 && playerTypes.length != 4) {
             System.out.println("Critical Error. Only combinations of 2 or 4 players are allowed");
@@ -268,12 +262,16 @@ public class CurrentGameInterface extends WndInterface {
         }
 
         for (int i = 0; i < playerTypes.length; i++) {
+            Rectangle playerRegion;
             if(playerTypes.length == 4) {
-                players.add(new Player(i, "Player", playerTypes[i],
-                        getPlayerRect((i + 4 - thisPlayerIndex) % 4)));
+                playerRegion = getPlayerRect((i + 4 - thisPlayerIndex) % 4);
             } else {
-                players.add(new Player(i, "Player", playerTypes[i],
-                        getPlayerRect(playerTypes[i] == Player.PlayerType.ThisPlayer ? 0 : 2)));
+                playerRegion = getPlayerRect(playerTypes[i] == Player.PlayerType.ThisPlayer ? 0 : 2);
+            }
+            if(playerTypes[i] == Player.PlayerType.AIPlayer) {
+                players.add(new AIPlayer(i, "AIPlayer", playerRegion, AIPlayer.AIStrategy.Random));
+            } else {
+                players.add(new Player(i, "Player", playerTypes[i], playerRegion));
             }
         }
 
