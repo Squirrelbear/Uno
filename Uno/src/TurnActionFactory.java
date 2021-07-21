@@ -30,19 +30,19 @@ public class TurnActionFactory {
         /**
          * Stores a map of data used for passing to the actions to keep stateful data about the action sequence.
          */
-        protected Map<String, Integer> storedData;
+        protected final Map<String, Integer> storedData;
         /**
          * The action to be performed via performAction().
          */
-        protected Consumer<Map<String, Integer>> action;
+        protected final Consumer<Map<String, Integer>> action;
         /**
          * Reference to the next TurnAction in the linked list sequence. This can be null to indicate the end.
          */
-        protected TurnAction next;
+        protected final TurnAction next;
         /**
          * Text to be used to describe the current state in debug output.
          */
-        protected String actionDebugText;
+        protected final String actionDebugText;
 
         /**
          * Stores the properties specified ready to use.
@@ -103,15 +103,15 @@ public class TurnActionFactory {
         /**
          * When true, the TurnDecisionAction has a time limit to complete it.
          */
-        protected boolean timeOut;
+        protected final boolean timeOut;
         /**
          * The alternative TurnAction to move to if the flag variable is non-zero.
          */
-        protected TurnAction otherNext;
+        protected final TurnAction otherNext;
         /**
          * The flag variable used to determine when the decision has been met.
          */
-        protected String flagName;
+        protected final String flagName;
         /**
          * A boolean to track whether the action has already been run.
          */

@@ -4,8 +4,13 @@ import java.awt.event.*;
 
 /**
  * Uno
- * Author: Peter Mitchell (2021)
  *
+ * GamePanel class:
+ * Manages the primary game with passing off actions from the mouse, keys, and
+ * any timer events to the different parts of the game.
+ *
+ * @author Peter Mitchell
+ * @version 2021.1
  */
 public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, ActionListener {
     /**
@@ -17,7 +22,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
      */
     private static final int PANEL_WIDTH = 1280;
 
-    private PauseInterface pauseWnd;
+    /**
+     * Reference to the window that appears when the game is paused.
+     */
+    private final PauseInterface pauseWnd;
+    /**
+     * Reference to the active game.
+     */
     private CurrentGameInterface activeGame;
 
     /**
@@ -53,11 +64,19 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         }
     }
 
+    /**
+     * Pauses or unpauses the game.
+     *
+     * @param isPaused When true the game is paused and pause window is shown.
+     */
     public void setPauseState(boolean isPaused) {
         activeGame.setEnabled(!isPaused);
         pauseWnd.setEnabled(isPaused);
     }
 
+    /**
+     * Quits the game immediately.
+     */
     public void quitGame() {
         System.exit(0);
     }
@@ -77,6 +96,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         } else if(keyCode == KeyEvent.VK_T) {
             activeGame.toggleTurnDirection();
         } else if(keyCode == KeyEvent.VK_D) {
+            // TODO
             TurnActionFactory.TurnAction turnAction = TurnActionFactory.playCardAsAction(1, 1,14,1);
             TurnActionFactory.debugOutputTurnActionTree(turnAction);
         }
@@ -84,7 +104,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     /**
-     *
+     * Passes the mouse event on to all the windows.
      *
      * @param e Information about the mouse event.
      */
@@ -96,6 +116,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         repaint();
     }
 
+    /**
+     * Passes the mouse event on to all the windows.
+     *
+     * @param e Information about the mouse event.
+     */
     @Override
     public void mouseMoved(MouseEvent e) {
         Position mousePosition = new Position(e.getX(), e.getY());
@@ -104,6 +129,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         repaint();
     }
 
+    /**
+     * Forces the active game to update and forces a repaint.
+     *
+     * @param e Information about the event.
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         activeGame.update(20);

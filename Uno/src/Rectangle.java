@@ -1,24 +1,26 @@
 /**
  * Uno
- * Author: Peter Mitchell (2021)
  *
  * Rectangle class:
  * Defines a simple Rectangle with a position for the top left corner,
  * and a width/height to represent the size of the Rectangle.
+ *
+ * @author Peter Mitchell
+ * @version 2021.1
  */
 public class Rectangle {
     /**
      * The top left corner of the Rectangle.
      */
-    protected Position position;
+    protected final Position position;
     /**
      * Width of the Rectangle.
      */
-    protected int width;
+    protected final int width;
     /**
      * Height of the Rectangle.
      */
-    protected int height;
+    protected final int height;
 
     /**
      * Creates the new Rectangle with provided properties.

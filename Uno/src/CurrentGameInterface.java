@@ -156,6 +156,10 @@ public class CurrentGameInterface extends WndInterface {
         bottomPlayer.sortHand();
     }
 
+    public Player getBottomPlayer() {
+        return bottomPlayer;
+    }
+
     public void toggleTurnDirection() {
         isIncreasing = !isIncreasing;
         playDirectionAnimation.setIsIncreasing(isIncreasing);

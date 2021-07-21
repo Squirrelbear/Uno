@@ -154,18 +154,39 @@ public class Card extends Rectangle {
         drawColour = getColourByID(colourID);
     }
 
+    /**
+     * Gets the current colour on the card.
+     *
+     * @return The current colourID of this card.
+     */
     public int getColourID() {
         return colourID;
     }
 
+    /**
+     * Gets the faceValueID of the card.
+     *
+     * @return The current faceValueID of the card.
+     */
     public int getFaceValueID() {
         return faceValueID;
     }
 
+    /**
+     * Gets the unique number that represents only this card.
+     *
+     * @return The unique cardID identifying this card.
+     */
     public int getCardID() {
         return cardID;
     }
 
+    /**
+     * Gets a mapped colour for the colourID or Black.
+     *
+     * @param colourID The colourID to get a Color to draw with.
+     * @return A Color mapped to the colourID. 0=Red, 1=Blue, 2=Green, 3=Yellow, Default=Black.
+     */
     public static Color getColourByID(int colourID) {
         return switch (colourID) {
             case 0 -> new Color(191, 48, 48);
@@ -176,6 +197,13 @@ public class Card extends Rectangle {
         };
     }
 
+    /**
+     * Gets the score based on the faceValue of the card.
+     * Numbered cards are their face value, wild and +4 are worth 50,
+     * and others are worth 20.
+     *
+     * @return The calculated score for this card.
+     */
     public int getScoreValue() {
         if(faceValueID < 10) return faceValueID;
         else if(faceValueID == 13 || faceValueID == 14) return 50;

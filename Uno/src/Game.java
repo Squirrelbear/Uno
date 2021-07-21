@@ -4,11 +4,13 @@ import java.awt.event.KeyListener;
 
 /**
  * Uno
- * Author: Peter Mitchell (2021)
  *
  * Game class:
  * Defines the entry point for the game by creating the frame,
  * and populating it with a GamePanel.
+ *
+ * @author Peter Mitchell
+ * @version 2021.1
  */
 public class Game implements KeyListener {
     /**
@@ -17,13 +19,13 @@ public class Game implements KeyListener {
      * @param args Not used.
      */
     public static void main(String[] args) {
-        Game game = new Game();
+        new Game();
     }
 
     /**
      * Reference to the GamePanel object to pass key events to.
      */
-    private GamePanel gamePanel;
+    private final GamePanel gamePanel;
 
     /**
      * Creates the JFrame with a GamePanel inside it, attaches a key listener,

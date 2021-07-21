@@ -1,9 +1,11 @@
 /**
  * Uno
- * Author: Peter Mitchell (2021)
  *
  * Position class:
  * Used to represent a single position x,y.
+ *
+ * @author Peter Mitchell
+ * @version 2021.1
  */
 public class Position {
     /**

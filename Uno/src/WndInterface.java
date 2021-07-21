@@ -2,10 +2,12 @@ import java.awt.*;
 
 /**
  * Uno
- * Author: Peter Mitchell
  *
  * WndInterface class:
  * Defines a generic abstraction to use for multiple interfaces.
+ *
+ * @author Peter Mitchell
+ * @version 2021.1
  */
 public abstract class WndInterface {
     /**
@@ -15,7 +17,7 @@ public abstract class WndInterface {
     /**
      * Bounds of this interface.
      */
-    protected Rectangle bounds;
+    protected final Rectangle bounds;
 
     /**
      * Initialise the interface with bounds and make it enabled.

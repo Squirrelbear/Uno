@@ -15,7 +15,7 @@ public class Button extends Rectangle {
     /**
      * A number that can be used to give context for when the button is detected to have been clicked.
      */
-    private int actionID;
+    private final int actionID;
     /**
      * True when the mouse is over the rectangle causing a colour change.
      */
@@ -23,7 +23,7 @@ public class Button extends Rectangle {
     /**
      * Text to centre in the button.
      */
-    private String text;
+    private final String text;
 
     /**
      * Sets up the Button ready to display and interact with.
