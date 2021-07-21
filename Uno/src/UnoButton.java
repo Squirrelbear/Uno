@@ -44,14 +44,6 @@ public class UnoButton extends WndInterface implements GeneralOverlayInterface {
     }
 
     /**
-     * Hides the overlay.
-     */
-    @Override
-    public void hideOverlay() {
-        setEnabled(false);
-    }
-
-    /**
      * Does nothing.
      *
      * @param deltaTime Time since last update.

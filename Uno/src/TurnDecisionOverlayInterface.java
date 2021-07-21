@@ -15,9 +15,4 @@ public interface TurnDecisionOverlayInterface {
      * @param currentAction The action used to trigger this interface.
      */
     void showOverlay(TurnActionFactory.TurnDecisionAction currentAction);
-
-    /**
-     * Hide the overlay.
-     */
-    void hideOverlay();
 }

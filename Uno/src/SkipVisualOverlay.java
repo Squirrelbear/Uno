@@ -36,14 +36,6 @@ public class SkipVisualOverlay extends WndInterface implements GeneralOverlayInt
     }
 
     /**
-     * Hides the overlay.
-     */
-    @Override
-    public void hideOverlay() {
-        setEnabled(false);
-    }
-
-    /**
      * Updates the timer to hide the overlay and hides it when it hits 0.
      *
      * @param deltaTime Time since last update.
@@ -52,7 +44,7 @@ public class SkipVisualOverlay extends WndInterface implements GeneralOverlayInt
     public void update(int deltaTime) {
         displayTimer -= deltaTime;
         if(displayTimer <= 0) {
-            hideOverlay();
+            setEnabled(false);
         }
     }
 

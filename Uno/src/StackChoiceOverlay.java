@@ -69,14 +69,6 @@ public class StackChoiceOverlay extends WndInterface implements TurnDecisionOver
     }
 
     /**
-     * Hides the overlay.
-     */
-    @Override
-    public void hideOverlay() {
-        setEnabled(false);
-    }
-
-    /**
      * Does nothing if not enabled. Updates the hover status of the decline button.
      *
      * @param mousePosition Position of the mouse during this movement.
@@ -102,7 +94,7 @@ public class StackChoiceOverlay extends WndInterface implements TurnDecisionOver
 
         if(declineButton.isPositionInside(mousePosition)) {
             currentAction.injectFlagProperty(0);
-            hideOverlay();
+            setEnabled(false);
             return;
         }
 
@@ -112,7 +104,7 @@ public class StackChoiceOverlay extends WndInterface implements TurnDecisionOver
             currentAction.injectProperty("colourID", clickedCard.getColourID());
             currentAction.injectProperty("cardID", clickedCard.getCardID());
             currentAction.injectFlagProperty(1);
-            hideOverlay();
+            setEnabled(false);
         }
     }
 }

@@ -71,14 +71,6 @@ public class PlayerSelectionOverlay extends WndInterface implements TurnDecision
     }
 
     /**
-     * Hides the overlay.
-     */
-    @Override
-    public void hideOverlay() {
-        setEnabled(false);
-    }
-
-    /**
      * Does nothing if not enabled. Updates the hover state for all buttons.
      *
      * @param mousePosition Position of the mouse during this movement.
@@ -105,7 +97,7 @@ public class PlayerSelectionOverlay extends WndInterface implements TurnDecision
 
         for (Button button : buttonList) {
             if(button.isPositionInside(mousePosition)) {
-                hideOverlay();
+                setEnabled(false);
                 currentAction.injectFlagProperty(button.getActionID());
                 break;
             }

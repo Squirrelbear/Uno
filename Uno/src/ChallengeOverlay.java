@@ -79,14 +79,6 @@ public class ChallengeOverlay extends WndInterface implements TurnDecisionOverla
     }
 
     /**
-     * Hides the overlay.
-     */
-    @Override
-    public void hideOverlay() {
-        setEnabled(false);
-    }
-
-    /**
      * Does nothing if not enabled. Updates the hover state for all buttons.
      *
      * @param mousePosition Position of the mouse during this movement.
@@ -117,7 +109,7 @@ public class ChallengeOverlay extends WndInterface implements TurnDecisionOverla
             if(button.isPositionInside(mousePosition)) {
                 currentAction.injectProperty("isChaining", 0);
                 currentAction.injectFlagProperty(button.getActionID());
-                hideOverlay();
+                setEnabled(false);
                 return;
             }
         }
@@ -130,7 +122,7 @@ public class ChallengeOverlay extends WndInterface implements TurnDecisionOverla
                 currentAction.injectProperty("cardID", clickedCard.getCardID());
                 currentAction.injectProperty("isChaining", 1);
                 currentAction.injectFlagProperty(0);
-                hideOverlay();
+                setEnabled(false);
             }
         }
     }

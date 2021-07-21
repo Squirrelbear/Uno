@@ -85,14 +85,6 @@ public class StatusOverlay extends WndInterface implements TurnDecisionOverlayIn
     }
 
     /**
-     * Hides the overlay.
-     */
-    @Override
-    public void hideOverlay() {
-        setEnabled(false);
-    }
-
-    /**
      * Checks whether the action is one the player has to do or if it is someone else,
      * and constructs a message relevant to the current situation.
      *

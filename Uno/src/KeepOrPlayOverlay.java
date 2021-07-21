@@ -83,14 +83,6 @@ public class KeepOrPlayOverlay extends WndInterface implements TurnDecisionOverl
     }
 
     /**
-     * Hides the overlay.
-     */
-    @Override
-    public void hideOverlay() {
-        setEnabled(false);
-    }
-
-    /**
      * Does nothing when not enabled. Updates the hover state of all buttons.
      *
      * @param mousePosition Position of the mouse during this movement.
@@ -117,7 +109,7 @@ public class KeepOrPlayOverlay extends WndInterface implements TurnDecisionOverl
 
         for (Button button : buttonList) {
             if(button.isPositionInside(mousePosition)) {
-                hideOverlay();
+                setEnabled(false);
                 currentAction.injectFlagProperty(button.getActionID());
                 break;
             }

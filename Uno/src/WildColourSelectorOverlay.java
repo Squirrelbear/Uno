@@ -101,7 +101,7 @@ public class WildColourSelectorOverlay extends WndInterface implements TurnDecis
         if(hoveredRegion != -1) {
             controllingTurnAction.injectProperty("colourID", hoveredRegion);
             controllingTurnAction.injectFlagProperty(1);
-            hideOverlay();
+            setEnabled(false);
         }
     }
 
@@ -114,13 +114,5 @@ public class WildColourSelectorOverlay extends WndInterface implements TurnDecis
     public void showOverlay(TurnActionFactory.TurnDecisionAction currentAction) {
         this.controllingTurnAction = currentAction;
         setEnabled(true);
-    }
-
-    /**
-     * Hides the overlay.
-     */
-    @Override
-    public void hideOverlay() {
-        setEnabled(false);
     }
 }

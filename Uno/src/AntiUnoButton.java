@@ -16,11 +16,6 @@ public class AntiUnoButton extends WndInterface implements GeneralOverlayInterfa
     }
 
     @Override
-    public void hideOverlay() {
-
-    }
-
-    @Override
     public void update(int deltaTime) {
 
     }

@@ -13,9 +13,4 @@ public interface GeneralOverlayInterface {
      * Show the overlay.
      */
     void showOverlay();
-
-    /**
-     * Hide the overlay.
-     */
-    void hideOverlay();
 }

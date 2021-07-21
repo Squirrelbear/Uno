@@ -66,7 +66,7 @@ public class OverlayManager extends WndInterface {
     public void hideOverlay() {
         overlays.forEach((key, overlay) -> {
             if(overlay instanceof TurnDecisionOverlayInterface) {
-                ((TurnDecisionOverlayInterface)overlay).hideOverlay();
+                overlay.setEnabled(false);
             }
         });
         setEnabled(false);
