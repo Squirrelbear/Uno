@@ -33,6 +33,13 @@ public class Player {
         } else {
             hand.forEach(card -> Card.paintCardBack(g, card));
         }
+        g.setFont(new Font("Arial", Font.BOLD, 20));
+        int strWidth = g.getFontMetrics().stringWidth(playerName);
+        g.setColor(new Color(1,1,1, 204));
+        g.fillRect(bounds.position.x, bounds.position.y-40, strWidth+30, 40);
+        g.setColor(CurrentGameInterface.getCurrentGame().getCurrentPlayer().getPlayerID() == getPlayerID()
+                ? Color.ORANGE : Color.WHITE);
+        g.drawString(playerName, bounds.position.x+15, bounds.position.y-15);
     }
 
     public void addCardToHand(Card card) {
