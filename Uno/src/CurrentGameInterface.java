@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Uno
@@ -91,8 +92,9 @@ public class CurrentGameInterface extends WndInterface {
      * Initialise the interface with bounds and make it enabled.
      *
      * @param bounds The bounds of the interface.
+     * @param lobbyPlayers Players to create in the game.
      */
-    public CurrentGameInterface(Rectangle bounds) {
+    public CurrentGameInterface(Rectangle bounds, List<LobbyPlayer> lobbyPlayers) {
         super(bounds);
         activeSingleton = this;
         players = new ArrayList<>();
@@ -101,15 +103,13 @@ public class CurrentGameInterface extends WndInterface {
         recentCards = new ArrayList<>();
         centredCardPos = new Position(bounds.position.x+bounds.width/2-30,bounds.position.y+bounds.height/2-45);
 
-        //createPlayers(Player.PlayerType.ThisPlayer, Player.PlayerType.AIPlayer);
-        createPlayers(Player.PlayerType.ThisPlayer, Player.PlayerType.AIPlayer, Player.PlayerType.AIPlayer, Player.PlayerType.AIPlayer);
+        createPlayers(lobbyPlayers);
         for (Player player : players) {
             for(int i = 0; i < 7; i++) {
                 player.addCardToHand(deck.drawCard());
             }
         }
-        //player = new Player(0, "Player", Player.PlayerType.AIPlayer, getPlayerRect(1));
-        currentPlayerID = bottomPlayer.getPlayerID(); //(int) (Math.random()*players.size());
+        currentPlayerID = bottomPlayer.getPlayerID(); //(int) (Math.random()*players.size()); // TODO
         isIncreasing = true;
         playDirectionAnimation = new PlayDirectionAnimation(new Position(bounds.width/2,bounds.height/2), 120, 5);
 
@@ -426,17 +426,17 @@ public class CurrentGameInterface extends WndInterface {
     /**
      * Generates a list of players using the specified types. Requires a single ThisPlayer and 1 or 3 AIPlayer.
      *
-     * @param playerTypes A list of player types to generate a collection.
+     * @param playerList A list of player data to generate a collection.
      */
-    private void createPlayers(Player.PlayerType ... playerTypes) {
-        if(playerTypes.length != 2 && playerTypes.length != 4) {
+    private void createPlayers(List<LobbyPlayer> playerList) {
+        List<LobbyPlayer> playersToAdd = playerList.stream().filter(lobbyPlayer -> lobbyPlayer.isEnabled()).collect(Collectors.toList());
+        if(playersToAdd.size() != 2 && playersToAdd.size() != 4) {
             System.out.println("Critical Error. Only combinations of 2 or 4 players are allowed");
             return;
         }
-
         int thisPlayerIndex = -1;
-        for(int i = 0; i < playerTypes.length; i++) {
-            if(playerTypes[i] == Player.PlayerType.ThisPlayer) {
+        for(int i = 0; i < playersToAdd.size(); i++) {
+            if(playersToAdd.get(i).getPlayerType() == Player.PlayerType.ThisPlayer) {
                 if(thisPlayerIndex == -1) {
                     thisPlayerIndex = i;
                 } else {
@@ -445,18 +445,22 @@ public class CurrentGameInterface extends WndInterface {
                 }
             }
         }
+        if(thisPlayerIndex == -1) {
+            System.out.println("Critical Error. One ThisPlayer is required!");
+            return;
+        }
 
-        for (int i = 0; i < playerTypes.length; i++) {
+        for (int i = 0; i < playersToAdd.size(); i++) {
             Rectangle playerRegion;
-            if(playerTypes.length == 4) {
+            if(playersToAdd.size() == 4) {
                 playerRegion = getPlayerRect((i + 4 - thisPlayerIndex) % 4);
             } else {
-                playerRegion = getPlayerRect(playerTypes[i] == Player.PlayerType.ThisPlayer ? 0 : 2);
+                playerRegion = getPlayerRect(playersToAdd.get(i).getPlayerType() == Player.PlayerType.ThisPlayer ? 0 : 2);
             }
-            if(playerTypes[i] == Player.PlayerType.AIPlayer) {
-                players.add(new AIPlayer(i, "AIPlayer", playerRegion, AIPlayer.AIStrategy.Random));
+            if(playersToAdd.get(i).getPlayerType() == Player.PlayerType.AIPlayer) {
+                players.add(new AIPlayer(i, playersToAdd.get(i).getPlayerName(), playerRegion, playersToAdd.get(i).getAIStrategy()));
             } else {
-                players.add(new Player(i, "Player", playerTypes[i], playerRegion));
+                players.add(new Player(i, playersToAdd.get(i).getPlayerName(), playersToAdd.get(i).getPlayerType(), playerRegion));
             }
         }
         bottomPlayer = players.get(thisPlayerIndex);

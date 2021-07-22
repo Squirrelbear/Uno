@@ -56,8 +56,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         addMouseMotionListener(this);
     }
 
+    /**
+     * Creates a new game with the specified list of players and then disables the lobby.
+     *
+     * @param playerList The player list to start a game with.
+     */
     public void startGame(List<LobbyPlayer> playerList) {
-        activeGame = new CurrentGameInterface(new Rectangle(0,0,PANEL_WIDTH,PANEL_HEIGHT));
+        activeGame = new CurrentGameInterface(new Rectangle(0,0,PANEL_WIDTH,PANEL_HEIGHT), playerList);
         lobbyInterface = null;
     }
 
