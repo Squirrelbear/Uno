@@ -335,7 +335,7 @@ public class TurnActionFactory {
         TurnAction moveToPreviousPlayer = new TurnAction(applyPenalty, storedData, TurnActionFactory::movePrevious, "Move to Previous Player");
         TurnAction increaseDrawBy2 = new TurnAction(increaseDrawBy4, storedData, TurnActionFactory::increaseDrawCountBy2, "Increase N (drawCount) by 2");
         TurnDecisionAction couldPreviousPlayCard = new TurnDecisionAction(increaseDrawBy2, moveToPreviousPlayer,
-                false, "couldPreviousPlayCard", storedData, null, "Could the Previous Player Have played a Card? (No Action)");
+                false, "couldPreviousPlayCard", storedData, TurnActionFactory::showChallengeResult, "Could the Previous Player Have played a Card? (No Action)");
         TurnDecisionAction isChallenging = new TurnDecisionAction(isChainingCard, couldPreviousPlayCard, true,
                 "isChallenging", storedData, TurnActionFactory::beginChoiceOverlay, "Ask if the player wants to Challenge, Stack, or Do Nothing");
         TurnAction moveToNextTurn = new TurnAction(isChallenging, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
@@ -527,7 +527,7 @@ public class TurnActionFactory {
      * @param storedData Reference to the shared stored data to be used for passing on to all the TurnAction sequence.
      */
     private static void drawNCards(Map<String, Integer> storedData) {
-        if(storedData.containsKey("drawCount")) {
+        if(storedData.containsKey("drawCount") && storedData.get("drawCount") != null && storedData.get("drawCount") > 0) {
             int count = storedData.get("drawCount");
             for(int i = 0; i < count; i++) {
                 drawCard(storedData);
@@ -723,6 +723,21 @@ public class TurnActionFactory {
             for(Card card : hands.get(playerID)) {
                 players.get(playerID).addCardToHand(card);
             }
+        }
+    }
+
+    /**
+     * Shows either a tick or cross overlay on the player who challenged.
+     *
+     * @param storedData Reference to the shared stored data to be used for passing on to all the TurnAction sequence.
+     */
+    private static void showChallengeResult(Map<String, Integer> storedData) {
+        if(storedData.get("couldPreviousPlayCard") == 0) {
+            CurrentGameInterface.getCurrentGame().showGeneralOverlay(
+                    "ChallengeFailed"+CurrentGameInterface.getCurrentGame().getCurrentPlayer().getPlayerID());
+        } else {
+            CurrentGameInterface.getCurrentGame().showGeneralOverlay(
+                    "ChallengeSuccess"+CurrentGameInterface.getCurrentGame().getCurrentPlayer().getPlayerID());
         }
     }
 }

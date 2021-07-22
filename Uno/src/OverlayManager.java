@@ -55,6 +55,10 @@ public class OverlayManager extends WndInterface {
             overlays.put("SkipVisual"+i,skipVisualOverlay);
             DrawNMessageOverlay drawNMessageOverlay = new DrawNMessageOverlay(playerList.get(i).getCentreOfBounds());
             overlays.put("DrawN"+i,drawNMessageOverlay);
+            ChallengeSuccessOverlay challengeSuccessOverlay = new ChallengeSuccessOverlay(new Rectangle(playerList.get(i).getCentreOfBounds(), 100,100));
+            overlays.put("ChallengeSuccess"+i,challengeSuccessOverlay);
+            ChallengeFailedOverlay challengeFailedOverlay = new ChallengeFailedOverlay(new Rectangle(playerList.get(i).getCentreOfBounds(), 100,100));
+            overlays.put("ChallengeFailed"+i,challengeFailedOverlay);
         }
         overlays.put("UnoButton", unoButton);
         overlays.put("antiUnoButton", antiUnoButton);

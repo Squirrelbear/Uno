@@ -3,7 +3,7 @@ import java.awt.*;
 /**
  * Uno
  *
- * SkipVisualOverlay class:
+ * DrawNMessageOverlay class:
  * Displays a short time flashing "+N" to show the number of cards a player drew.
  *
  * @author Peter Mitchell
@@ -63,7 +63,7 @@ public class DrawNMessageOverlay extends WndInterface implements GeneralOverlayI
     }
 
     /**
-     * Draws the SKIPPED text flashing with showing 75% of the time.
+     * Draws the +N text flashing with showing 75% of the time.
      *
      * @param g Reference to the Graphics object for rendering.
      */
