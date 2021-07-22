@@ -532,6 +532,9 @@ public class TurnActionFactory {
             for(int i = 0; i < count; i++) {
                 drawCard(storedData);
             }
+            CurrentGameInterface.getCurrentGame().showGeneralOverlay(
+                    "DrawN"+CurrentGameInterface.getCurrentGame().getCurrentPlayer().getPlayerID()
+                                + ";" + count);
             storedData.remove("drawCount");
         }
     }
@@ -651,6 +654,8 @@ public class TurnActionFactory {
         for(int i = 0; i < 4; i++) {
             drawCard(storedData);
         }
+        CurrentGameInterface.getCurrentGame().showGeneralOverlay(
+                "DrawN"+CurrentGameInterface.getCurrentGame().getCurrentPlayer().getPlayerID() + ";4");
     }
 
     /**

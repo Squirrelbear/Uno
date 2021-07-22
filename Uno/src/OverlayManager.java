@@ -53,6 +53,8 @@ public class OverlayManager extends WndInterface {
         for(int i = 0; i < playerList.size(); i++) {
             SkipVisualOverlay skipVisualOverlay = new SkipVisualOverlay(playerList.get(i).getCentreOfBounds());
             overlays.put("SkipVisual"+i,skipVisualOverlay);
+            DrawNMessageOverlay drawNMessageOverlay = new DrawNMessageOverlay(playerList.get(i).getCentreOfBounds());
+            overlays.put("DrawN"+i,drawNMessageOverlay);
         }
         overlays.put("UnoButton", unoButton);
         overlays.put("antiUnoButton", antiUnoButton);
@@ -85,9 +87,15 @@ public class OverlayManager extends WndInterface {
      * @param overlayName Name that maps to an interface.
      */
     public void showGeneralOverlay(String overlayName) {
-        WndInterface overlayToShow = overlays.get(overlayName);
+        // Split to allow for parameter inputs separated by ;
+        String[] splitOverlayName = overlayName.split(";");
+        WndInterface overlayToShow = overlays.get(splitOverlayName[0]);
         if(overlayToShow instanceof GeneralOverlayInterface) {
             ((GeneralOverlayInterface)overlayToShow).showOverlay();
+            if(overlayToShow instanceof DrawNMessageOverlay) {
+                // Sets the number to be displayed.
+                ((DrawNMessageOverlay)overlayToShow).setN(Integer.parseInt(splitOverlayName[1]));
+            }
         }
     }
 
