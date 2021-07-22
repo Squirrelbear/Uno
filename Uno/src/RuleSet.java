@@ -46,6 +46,11 @@ public class RuleSet {
      * The time player's have to make their choice during actions.
      */
     private final int defaultTimeOut;
+    /**
+     * Used to determine if Reverse becomes a skip when true.
+     */
+    private boolean onlyTwoPlayers;
+
 
     /**
      * Initialises a default RuleSet.
@@ -62,6 +67,7 @@ public class RuleSet {
         faceValueToActionMap[14] = CardAction.Wild;
         canStackCards = true;
         drawnTillCanPlay = true;
+        onlyTwoPlayers = false;
         defaultTimeOut = 25;
     }
 
@@ -118,5 +124,24 @@ public class RuleSet {
      */
     public int getDefaultTimeOut() {
         return defaultTimeOut;
+    }
+
+    /**
+     * Sets the state of whether there are only two players.
+     *
+     * @param onlyTwoPlayers When true Reverse becomes a skip.
+     */
+    public void setTwoPlayers(boolean onlyTwoPlayers) {
+        this.onlyTwoPlayers = onlyTwoPlayers;
+        faceValueToActionMap[12] = onlyTwoPlayers ? CardAction.Skip : CardAction.Reverse;
+    }
+
+    /**
+     * Gets the current state of the two players.
+     *
+     * @return True if the only two player rules are active with Reverse set to a skip.
+     */
+    public boolean getOnlyTwoPlayers() {
+        return onlyTwoPlayers;
     }
 }

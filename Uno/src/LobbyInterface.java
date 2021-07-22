@@ -165,6 +165,7 @@ public class LobbyInterface extends WndInterface {
     private void toggleNumberOfPlayers() {
         playerList.get(2).setEnabled(!playerList.get(2).isEnabled());
         playerList.get(3).setEnabled(!playerList.get(3).isEnabled());
+        ruleSet.setTwoPlayers(!ruleSet.getOnlyTwoPlayers());
     }
 
     /**
