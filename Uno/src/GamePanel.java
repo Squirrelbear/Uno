@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
 
 /**
  * Uno
@@ -30,6 +31,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
      * Reference to the active game.
      */
     private CurrentGameInterface activeGame;
+    /**
+     * Reference to the lobby to set up games.
+     */
+    private LobbyInterface lobbyInterface;
 
     /**
      * Configures the game ready to be played including selection of playing against either
@@ -42,13 +47,18 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         pauseWnd = new PauseInterface(new Rectangle(PANEL_WIDTH/2-100,PANEL_HEIGHT/2-100,200,200), this);
         pauseWnd.setEnabled(false);
 
-        activeGame = new CurrentGameInterface(new Rectangle(0,0,PANEL_WIDTH,PANEL_HEIGHT));
+        lobbyInterface = new LobbyInterface(new Rectangle(0,0,PANEL_WIDTH, PANEL_HEIGHT), this);
 
         Timer updateTimer = new Timer(20, this);
         updateTimer.start();
 
         addMouseListener(this);
         addMouseMotionListener(this);
+    }
+
+    public void startGame(List<LobbyPlayer> playerList) {
+        activeGame = new CurrentGameInterface(new Rectangle(0,0,PANEL_WIDTH,PANEL_HEIGHT));
+        lobbyInterface = null;
     }
 
     /**
@@ -58,7 +68,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
      */
     public void paint(Graphics g) {
         super.paint(g);
-        activeGame.paint(g);
+        if(lobbyInterface != null) {
+            lobbyInterface.paint(g);
+        }
+        if(activeGame != null) {
+            activeGame.paint(g);
+        }
         if(pauseWnd.isEnabled()) {
             pauseWnd.paint(g);
         }
@@ -70,7 +85,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
      * @param isPaused When true the game is paused and pause window is shown.
      */
     public void setPauseState(boolean isPaused) {
-        activeGame.setEnabled(!isPaused);
+        if(activeGame != null) {
+            activeGame.setEnabled(!isPaused);
+        }
+        if(lobbyInterface != null) {
+            lobbyInterface.setEnabled(!isPaused);
+        }
         pauseWnd.setEnabled(isPaused);
     }
 
@@ -112,7 +132,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     public void mousePressed(MouseEvent e) {
         Position mousePosition = new Position(e.getX(), e.getY());
         pauseWnd.handleMousePress(mousePosition, e.getButton() == 1);
-        activeGame.handleMousePress(mousePosition, e.getButton() == 1);
+        if(activeGame != null) {
+            activeGame.handleMousePress(mousePosition, e.getButton() == 1);
+        }
+        if(lobbyInterface != null) {
+            lobbyInterface.handleMousePress(mousePosition, e.getButton() == 1);
+        }
         repaint();
     }
 
@@ -125,7 +150,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     public void mouseMoved(MouseEvent e) {
         Position mousePosition = new Position(e.getX(), e.getY());
         pauseWnd.handleMouseMove(mousePosition);
-        activeGame.handleMouseMove(mousePosition);
+        if(activeGame != null) {
+            activeGame.handleMouseMove(mousePosition);
+        }
+        if(lobbyInterface != null) {
+            lobbyInterface.handleMouseMove(mousePosition);
+        }
         repaint();
     }
 
@@ -136,7 +166,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        activeGame.update(20);
+        if(activeGame != null) {
+            activeGame.update(20);
+        }
         repaint();
     }
 
