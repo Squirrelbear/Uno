@@ -33,7 +33,7 @@ public class RuleSet {
     /**
      * 0 to 14 mapped with CardActions to represent each of the different Uno cards.
      */
-    private CardAction[] faceValueToActionMap;
+    private final CardAction[] faceValueToActionMap;
     /**
      * True if +2 and +4 cards can be stacked in response.
      */
@@ -45,7 +45,7 @@ public class RuleSet {
     /**
      * The time player's have to make their choice during actions.
      */
-    private int defaultTimeOut;
+    private final int defaultTimeOut;
 
     /**
      * Initialises a default RuleSet.
@@ -85,12 +85,30 @@ public class RuleSet {
     }
 
     /**
+     * Changes the state of card stacking.
+     *
+     * @param canStackCards When true +2 and +4 cards can be stacked in response.
+     */
+    public void setCanStackCards(boolean canStackCards) {
+        this.canStackCards = canStackCards;
+    }
+
+    /**
      * Checks whether cards must be drawn till one can be played.
      *
      * @return True if when drawing from the deck for turn cards must continue to be drawn till a playable card is found.
      */
     public boolean shouldDrawnTillCanPlay() {
         return drawnTillCanPlay;
+    }
+
+    /**
+     * Changes the state of drawing to a card can be played.
+     *
+     * @param drawnTillCanPlay When true cards must be drawn until one can be played.
+     */
+    public void setDrawnTillCanPlay(boolean drawnTillCanPlay) {
+        this.drawnTillCanPlay = drawnTillCanPlay;
     }
 
     /**

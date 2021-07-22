@@ -38,6 +38,10 @@ public class LobbyPlayer extends Rectangle {
      * True when the mouse is over the player.
      */
     private boolean isHovered;
+    /**
+     * String representing the type of player.
+     */
+    private final String playerTypeStr;
 
     /**
      * Initialises the object ready to show information about the player.
@@ -53,8 +57,9 @@ public class LobbyPlayer extends Rectangle {
         this.playerName = playerName;
         this.playerType = playerType;
         aiStrategy = AIPlayer.AIStrategy.Random;
-        strategyStr = aiStrategy.toString();
+        strategyStr = "Strategy: " + aiStrategy.toString();
         isEnabled = true;
+        playerTypeStr = playerType == Player.PlayerType.ThisPlayer ? "You:" : "AI Player:";
     }
 
     /**
@@ -130,7 +135,7 @@ public class LobbyPlayer extends Rectangle {
             case Defensive -> aiStrategy = AIPlayer.AIStrategy.Chaotic;
             case Chaotic -> aiStrategy = AIPlayer.AIStrategy.Random;
         }
-        strategyStr = aiStrategy.toString();
+        strategyStr = "Strategy: " + aiStrategy.toString();
     }
 
     /**
@@ -144,16 +149,18 @@ public class LobbyPlayer extends Rectangle {
         if(isHovered) {
             g.setColor(new Color(115, 156, 58, 204));
         } else {
-            g.setColor(new Color(68, 97, 28, 204));
+            g.setColor(new Color(118, 94, 57, 204));
         }
         g.fillRect(position.x, position.y, width, height);
         g.setColor(Color.BLACK);
         g.drawRect(position.x, position.y, width, height);
 
-        g.drawString(playerName, position.x + 20, position.y+40);
+        g.setFont(new Font("Arial", Font.BOLD, 20));
+        g.drawString(playerTypeStr, position.x + 20, position.y+50);
+        g.drawString(playerName, position.x + 120, position.y+50);
 
         if(playerType == Player.PlayerType.AIPlayer) {
-            g.drawString(strategyStr, position.x+200, position.y+40);
+            g.drawString(strategyStr, position.x+300, position.y+50);
         }
     }
 

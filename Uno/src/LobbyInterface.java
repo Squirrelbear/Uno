@@ -15,15 +15,28 @@ public class LobbyInterface extends WndInterface {
     /**
      * List of the players. Always contains 4. Those that are enabled are considered active.
      */
-    private List<LobbyPlayer> playerList;
+    private final List<LobbyPlayer> playerList;
     /**
      * List of buttons visible on the lobby interface.
      */
-    private List<Button> buttonList;
+    private final List<Button> buttonList;
     /**
      * Reference to the GamePanel for callbacks.
      */
-    private GamePanel gamePanel;
+    private final GamePanel gamePanel;
+    /**
+     * The RuleSet being configured.
+     */
+    private final RuleSet ruleSet;
+
+    /**
+     * String showing the stack rule state.
+     */
+    private String stackRuleStateStr;
+    /**
+     * String showing the draw rule state.
+     */
+    private String drawTillPlayableRuleStateStr;
 
     /**
      * Initialise the interface with bounds and make it enabled.
@@ -48,6 +61,11 @@ public class LobbyInterface extends WndInterface {
                 "Toggle Number of Players", 1));
         buttonList.add(new Button(new Position(bounds.width*3/4-150, bounds.height-100),300,60,
                 "Start Game", 2));
+        ruleSet = new RuleSet();
+        toggleStackRule();
+        toggleDrawTillCanPlayRule();
+        buttonList.add(new Button(new Position(bounds.width/2+120, 150),150,40, "Toggle Rule", 3));
+        buttonList.add(new Button(new Position(bounds.width/2+120, 200),150,40, "Toggle Rule", 4));
     }
 
     /**
@@ -67,14 +85,26 @@ public class LobbyInterface extends WndInterface {
      */
     @Override
     public void paint(Graphics g) {
+        // Draw backgrounds
         g.setColor(new Color(205, 138, 78, 128));
         g.fillRect(10, 80, bounds.width/2+20, 500);
+        g.fillRect(bounds.width/2+40, 80, bounds.width/2-60, 500);
         g.setColor(Color.BLACK);
         g.drawRect(10, 80, bounds.width/2+20, 500);
+        g.drawRect(bounds.width/2+40, 80, bounds.width/2-60, 500);
 
+        // Draw interaction elements
         buttonList.forEach(button -> button.paint(g));
         playerList.forEach(lobbyPlayer -> lobbyPlayer.paint(g));
 
+        // Draw rule status elements
+        g.setFont(new Font("Arial", Font.BOLD, 30));
+        g.drawString("Rules", bounds.width/2+280, 120);
+        g.setFont(new Font("Arial", Font.BOLD, 20));
+        g.drawString(stackRuleStateStr, bounds.width/2+300, 180);
+        g.drawString(drawTillPlayableRuleStateStr, bounds.width/2+300, 230);
+
+        // Pause overlay
         if(!isEnabled()) {
             g.setColor(new Color(144, 143, 143, 204));
             g.fillRect(bounds.position.x, bounds.position.y, bounds.width, bounds.height);
@@ -123,7 +153,9 @@ public class LobbyInterface extends WndInterface {
     private void handleButtonPress(int actionID) {
         switch (actionID) {
             case 1 -> toggleNumberOfPlayers();
-            case 2 -> gamePanel.startGame(playerList);
+            case 2 -> gamePanel.startGame(playerList, ruleSet);
+            case 3 -> toggleStackRule();
+            case 4 -> toggleDrawTillCanPlayRule();
         }
     }
 
@@ -133,5 +165,23 @@ public class LobbyInterface extends WndInterface {
     private void toggleNumberOfPlayers() {
         playerList.get(2).setEnabled(!playerList.get(2).isEnabled());
         playerList.get(3).setEnabled(!playerList.get(3).isEnabled());
+    }
+
+    /**
+     * Toggles the stacking rule and updates the message.
+     */
+    private void toggleStackRule() {
+        ruleSet.setCanStackCards(!ruleSet.canStackCards());
+        stackRuleStateStr = "Stacking +2/+4: "
+                + (ruleSet.canStackCards() ? "On" : "Off");
+    }
+
+    /**
+     * Toggles the draw rule and updates the message.
+     */
+    private void toggleDrawTillCanPlayRule() {
+        ruleSet.setDrawnTillCanPlay(!ruleSet.shouldDrawnTillCanPlay());
+        drawTillPlayableRuleStateStr = "Draw Till Can Play: "
+                + (ruleSet.shouldDrawnTillCanPlay() ? "On" : "Off");
     }
 }

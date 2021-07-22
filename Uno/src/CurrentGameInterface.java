@@ -93,12 +93,13 @@ public class CurrentGameInterface extends WndInterface {
      *
      * @param bounds The bounds of the interface.
      * @param lobbyPlayers Players to create in the game.
+     * @param ruleSet The rules definition for how the game is to be played.
      */
-    public CurrentGameInterface(Rectangle bounds, List<LobbyPlayer> lobbyPlayers) {
+    public CurrentGameInterface(Rectangle bounds, List<LobbyPlayer> lobbyPlayers, RuleSet ruleSet) {
         super(bounds);
         activeSingleton = this;
         players = new ArrayList<>();
-        ruleSet = new RuleSet();
+        this.ruleSet = ruleSet;
         deck = new Deck(new Position(100,100));
         recentCards = new ArrayList<>();
         centredCardPos = new Position(bounds.position.x+bounds.width/2-30,bounds.position.y+bounds.height/2-45);
