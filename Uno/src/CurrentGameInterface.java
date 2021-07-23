@@ -430,7 +430,7 @@ public class CurrentGameInterface extends WndInterface {
      * @param playerList A list of player data to generate a collection.
      */
     private void createPlayers(List<LobbyPlayer> playerList) {
-        List<LobbyPlayer> playersToAdd = playerList.stream().filter(lobbyPlayer -> lobbyPlayer.isEnabled()).collect(Collectors.toList());
+        List<LobbyPlayer> playersToAdd = playerList.stream().filter(LobbyPlayer::isEnabled).collect(Collectors.toList());
         if(playersToAdd.size() != 2 && playersToAdd.size() != 4) {
             System.out.println("Critical Error. Only combinations of 2 or 4 players are allowed");
             return;

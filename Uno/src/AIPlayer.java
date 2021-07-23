@@ -92,7 +92,7 @@ public class AIPlayer extends Player {
         } else {
             // Handle the turn action if it is necessary
             TurnActionFactory.TurnAction currentAction = CurrentGameInterface.getCurrentGame().getCurrentTurnAction();
-            if(currentAction != null && currentAction instanceof TurnActionFactory.TurnDecisionAction) {
+            if(currentAction instanceof TurnActionFactory.TurnDecisionAction) {
                 TurnActionFactory.TurnDecisionAction decisionAction = (TurnActionFactory.TurnDecisionAction) currentAction;
                 if(decisionAction.timeOut) {
                     handleTurnDecision(decisionAction);
@@ -197,8 +197,8 @@ public class AIPlayer extends Player {
      * @param decisionAction Reference to the current action requiring a decision.
      */
     private void choosePlayerToSwapWith(TurnActionFactory.TurnDecisionAction decisionAction) {
-        Player chosenPlayer = null;
-        int cardCount = 999;
+        Player chosenPlayer = this;
+        int cardCount = 9999;
         for(Player player : CurrentGameInterface.getCurrentGame().getAllPlayers()) {
             if(player.getHand().size() < cardCount && player != this) {
                 chosenPlayer = player;

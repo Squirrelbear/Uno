@@ -71,13 +71,13 @@ public class LobbyInterface extends WndInterface {
         super(bounds);
         this.gamePanel = gamePanel;
         playerList = new ArrayList<>();
-        playerList.add(new LobbyPlayer(0,"Player", Player.PlayerType.ThisPlayer,
+        playerList.add(new LobbyPlayer("Player", Player.PlayerType.ThisPlayer,
                 new Rectangle(new Position(20,100),bounds.width/2, 100)));
-        playerList.add(new LobbyPlayer(0,"Player", Player.PlayerType.AIPlayer,
+        playerList.add(new LobbyPlayer("Player", Player.PlayerType.AIPlayer,
                 new Rectangle(new Position(20,100+120),bounds.width/2, 100)));
-        playerList.add(new LobbyPlayer(0,"Player", Player.PlayerType.AIPlayer,
+        playerList.add(new LobbyPlayer("Player", Player.PlayerType.AIPlayer,
                 new Rectangle(new Position(20,100+120*2),bounds.width/2, 100)));
-        playerList.add(new LobbyPlayer(0,"Player", Player.PlayerType.AIPlayer,
+        playerList.add(new LobbyPlayer("Player", Player.PlayerType.AIPlayer,
                 new Rectangle(new Position(20,100+120*3),bounds.width/2, 100)));
 
         buttonList = new ArrayList<>();

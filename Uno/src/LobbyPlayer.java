@@ -12,10 +12,6 @@ import java.awt.*;
  */
 public class LobbyPlayer extends Rectangle {
     /**
-     * The unique ID of the player.
-     */
-    private final int playerID;
-    /**
      * The name shown for the player.
      */
     private String playerName;
@@ -47,14 +43,12 @@ public class LobbyPlayer extends Rectangle {
     /**
      * Initialises the object ready to show information about the player.
      *
-     * @param playerID The unique ID of the player.
      * @param playerName The name shown for the player.
      * @param playerType The type of player (ThisPlayer, AIPlayer, or NetworkPlayer).
      * @param bounds Region for interacting with this player object in the menu.
      */
-    public LobbyPlayer(int playerID, String playerName, Player.PlayerType playerType, Rectangle bounds) {
+    public LobbyPlayer(String playerName, Player.PlayerType playerType, Rectangle bounds) {
         super(bounds.position, bounds.width, bounds.height);
-        this.playerID = playerID;
         this.playerName = playerName;
         this.playerType = playerType;
         aiStrategy = AIPlayer.AIStrategy.Random;
@@ -79,15 +73,6 @@ public class LobbyPlayer extends Rectangle {
      */
     public String getPlayerName() {
         return playerName;
-    }
-
-    /**
-     * Gets the unique ID for this player.
-     *
-     * @return The unique ID associated with this player.
-     */
-    public int getPlayerID() {
-        return playerID;
     }
 
     /**
