@@ -5,10 +5,6 @@
 
 
 
-    Two Player: Reverse becomes skip
-
-    Progressive Uno: Response Allowed for +2 and +4 enabled
-
     Seven-O: 7 (Swap Action) 0 (all pass hand to left)
 
     TODO
@@ -31,6 +27,11 @@ public class RuleSet {
     public enum CardAction { Nothing, Plus2, Plus4, Wild, Skip, Reverse, Swap, PassAll}
 
     /**
+     * Score limits that determine how long the game will run for.
+     */
+    public enum ScoreLimitType {OneRound, Score200, Score300, Score500, Unlimited}
+
+    /**
      * 0 to 14 mapped with CardActions to represent each of the different Uno cards.
      */
     private final CardAction[] faceValueToActionMap;
@@ -50,7 +51,26 @@ public class RuleSet {
      * Used to determine if Reverse becomes a skip when true.
      */
     private boolean onlyTwoPlayers;
-
+    /**
+     * When true the 7 becomes a swap action, and 0 becomes a pass all action.
+     */
+    private boolean sevenZeroRule;
+    /**
+     * When no bluffing is true, the +4 can not be challenged.
+     */
+    private boolean noBluffingRule;
+    /**
+     * When true, players can jump in out of turn order with cards showing the same face value.
+     */
+    private boolean allowJumpInRule;
+    /**
+     * When true, there is no keep or play choice, it is forced play.
+     */
+    private boolean forcedPlayRule;
+    /**
+     * Stores the type of score limit to use for managing the end of game.
+     */
+    private ScoreLimitType scoreLimitType;
 
     /**
      * Initialises a default RuleSet.
@@ -65,10 +85,19 @@ public class RuleSet {
         faceValueToActionMap[12] = CardAction.Reverse;
         faceValueToActionMap[13] = CardAction.Plus4;
         faceValueToActionMap[14] = CardAction.Wild;
-        canStackCards = true;
-        drawnTillCanPlay = true;
-        onlyTwoPlayers = false;
         defaultTimeOut = 25;
+        setToDefaults();
+    }
+
+    public void setToDefaults() {
+        setCanStackCards(true);
+        setDrawnTillCanPlay(true);
+        setTwoPlayers(false);
+        setSevenZeroRule(false);
+        setForcedPlayRule(false);
+        setAllowJumpInRule(false);
+        setNoBuffingRule(false);
+        setScoreLimitType(ScoreLimitType.OneRound);
     }
 
     /**
@@ -143,5 +172,97 @@ public class RuleSet {
      */
     public boolean getOnlyTwoPlayers() {
         return onlyTwoPlayers;
+    }
+
+    /**
+     * Changes the state of whether the seven-zero rule is active.
+     *
+     * @param sevenZeroRule When true 7 is a swap action and 0 is a pass all action.
+     */
+    public void setSevenZeroRule(boolean sevenZeroRule) {
+        this.sevenZeroRule = sevenZeroRule;
+        faceValueToActionMap[0] = sevenZeroRule ? CardAction.Swap : CardAction.Nothing;
+        faceValueToActionMap[7] = sevenZeroRule ? CardAction.PassAll : CardAction.Nothing;
+    }
+
+    /**
+     * Checks whether the Seven-Zero rule is active.
+     *
+     * @return When true 7 is a swap action and 0 is a pass all action.
+     */
+    public boolean getSevenZeroRule() {
+        return sevenZeroRule;
+    }
+
+    /**
+     * Sets the No Buffing rule.
+     *
+     * @param noBluffingRule When no bluffing is true, the +4 can not be challenged.
+     */
+    public void setNoBuffingRule(boolean noBluffingRule) {
+        this.noBluffingRule = noBluffingRule;
+    }
+
+    /**
+     * Gets the current state of the no bluffing rule.
+     *
+     * @return When no bluffing is true, the +4 can not be challenged.
+     */
+    public boolean getNoBluffingRule() {
+        return noBluffingRule;
+    }
+
+    /**
+     * Sets the current state of the allowing jump in rule.
+     *
+     * @param allowJumpInRule When true players can jump in with cards of the same face value.
+     */
+    public void setAllowJumpInRule(boolean allowJumpInRule) {
+        this.allowJumpInRule = allowJumpInRule;
+    }
+
+    /**
+     * Gets the current state of the jump in rule.
+     *
+     * @return When true players can jump in with cards of the same face value.
+     */
+    public boolean allowJumpInRule() {
+        return allowJumpInRule;
+    }
+
+    /**
+     * Sets the current state of the forced play rule.
+     *
+     * @param forcedPlayRule When forced play is true, there should be no keep or play choice.
+     */
+    public void setForcedPlayRule(boolean forcedPlayRule) {
+        this.forcedPlayRule = forcedPlayRule;
+    }
+
+    /**
+     * Gets the current state of the forced play rule.
+     *
+     * @return When forced play is true, there should be no keep or play choice.
+     */
+    public boolean getForcedPlayRule() {
+        return forcedPlayRule;
+    }
+
+    /**
+     * Sets the score limit to wind the rounds.
+     *
+     * @param scoreLimitType The new score limit to apply.
+     */
+    public void setScoreLimitType(ScoreLimitType scoreLimitType) {
+        this.scoreLimitType = scoreLimitType;
+    }
+
+    /**
+     * Gets the current score limit setting.
+     *
+     * @return The current score limit to win all the rounds.
+     */
+    public ScoreLimitType getScoreLimitType() {
+        return scoreLimitType;
     }
 }

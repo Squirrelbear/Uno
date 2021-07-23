@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.awt.*;
 
 /**
@@ -126,9 +127,38 @@ public class LobbyPlayer extends Rectangle {
     }
 
     /**
+     * Handles the click to either iterate the strategy for AI or choose a new name for the player.
+     */
+    public void handleClick() {
+        if(playerType == Player.PlayerType.AIPlayer) {
+            iterateStrategy();
+        } else {
+            chooseNewName();
+        }
+    }
+
+    /**
+     * Provides a JOptionPane input to input a string up to 12 characters long.
+     * The String trims whitespace before evaluating and caps the maximum length
+     * at 12 characters long. It will do nothing if there is not at least 1 valid character.
+     */
+    private void chooseNewName() {
+        String newName = JOptionPane.showInputDialog(null, "Enter a name up to 12 characters long!");
+        if(newName != null) {
+            newName = newName.trim();
+            if(newName.length() > 12) {
+                newName = newName.substring(0,12);
+            }
+            if(newName.length() > 0) {
+                setPlayerName(newName);
+            }
+        }
+    }
+
+    /**
      * Iterates through the list of AI Strategies to the next one.
      */
-    public void iterateStrategy() {
+    private void iterateStrategy() {
         switch (aiStrategy) {
             case Random -> aiStrategy = AIPlayer.AIStrategy.Offensive;
             case Offensive -> aiStrategy = AIPlayer.AIStrategy.Defensive;
@@ -161,6 +191,9 @@ public class LobbyPlayer extends Rectangle {
 
         if(playerType == Player.PlayerType.AIPlayer) {
             g.drawString(strategyStr, position.x+300, position.y+50);
+            g.drawString("(Click to cycle strategies)", position.x+300, position.y+75);
+        } else {
+            g.drawString("(Click to change your name)", position.x+300, position.y+50);
         }
     }
 

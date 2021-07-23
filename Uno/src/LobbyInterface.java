@@ -37,6 +37,30 @@ public class LobbyInterface extends WndInterface {
      * String showing the draw rule state.
      */
     private String drawTillPlayableRuleStateStr;
+    /**
+     * String showing the state of the two player rule.
+     */
+    private String twoPlayerRuleStr, twoPlayerPrefixStr;
+    /**
+     * String showing the seven-zero rule state.
+     */
+    private String sevenZeroRuleStr;
+    /**
+     * Forced Play Rule state string.
+     */
+    private String forcedPlayRuleStr;
+    /**
+     * Jump-In rule state string.
+     */
+    private String jumpInRuleStr;
+    /**
+     * No bluffing rule state string.
+     */
+    private String noBluffingRuleStr;
+    /**
+     * Score limit for the game to be started.
+     */
+    private String scoreLimitStr;
 
     /**
      * Initialise the interface with bounds and make it enabled.
@@ -62,10 +86,15 @@ public class LobbyInterface extends WndInterface {
         buttonList.add(new Button(new Position(bounds.width*3/4-150, bounds.height-100),300,60,
                 "Start Game", 2));
         ruleSet = new RuleSet();
-        toggleStackRule();
-        toggleDrawTillCanPlayRule();
-        buttonList.add(new Button(new Position(bounds.width/2+120, 150),150,40, "Toggle Rule", 3));
-        buttonList.add(new Button(new Position(bounds.width/2+120, 200),150,40, "Toggle Rule", 4));
+        updateAllRuleLabels();
+        buttonList.add(new Button(new Position(bounds.width/2+120, 145),150,40, "Toggle Rule", 3));
+        buttonList.add(new Button(new Position(bounds.width/2+120, 195),150,40, "Toggle Rule", 4));
+        buttonList.add(new Button(new Position(bounds.width/2+120, 285),150,40, "Toggle Rule", 5));
+        buttonList.add(new Button(new Position(bounds.width/2+120, 335),150,40, "Toggle Rule", 6));
+        buttonList.add(new Button(new Position(bounds.width/2+120, 385),150,40, "Toggle Rule", 7));
+        buttonList.add(new Button(new Position(bounds.width/2+120, 435),150,40, "Toggle Rule", 8));
+        buttonList.add(new Button(new Position(bounds.width/2+120, 485),150,40, "Cycle Limit", 9));
+        buttonList.add(new Button(new Position(bounds.width*3/4-100, 535),200,40, "Reset To Default", 10));
     }
 
     /**
@@ -85,30 +114,66 @@ public class LobbyInterface extends WndInterface {
      */
     @Override
     public void paint(Graphics g) {
-        // Draw backgrounds
-        g.setColor(new Color(205, 138, 78, 128));
-        g.fillRect(10, 80, bounds.width/2+20, 500);
-        g.fillRect(bounds.width/2+40, 80, bounds.width/2-60, 500);
-        g.setColor(Color.BLACK);
-        g.drawRect(10, 80, bounds.width/2+20, 500);
-        g.drawRect(bounds.width/2+40, 80, bounds.width/2-60, 500);
+        drawBackground(g);
 
         // Draw interaction elements
         buttonList.forEach(button -> button.paint(g));
         playerList.forEach(lobbyPlayer -> lobbyPlayer.paint(g));
 
-        // Draw rule status elements
-        g.setFont(new Font("Arial", Font.BOLD, 30));
-        g.drawString("Rules", bounds.width/2+280, 120);
-        g.setFont(new Font("Arial", Font.BOLD, 20));
-        g.drawString(stackRuleStateStr, bounds.width/2+300, 180);
-        g.drawString(drawTillPlayableRuleStateStr, bounds.width/2+300, 230);
+        drawRuleText(g);
 
         // Pause overlay
         if(!isEnabled()) {
             g.setColor(new Color(144, 143, 143, 204));
             g.fillRect(bounds.position.x, bounds.position.y, bounds.width, bounds.height);
         }
+    }
+
+    /**
+     * Draws the background and game title.
+     *
+     * @param g Reference to the Graphics object for rendering.
+     */
+    private void drawBackground(Graphics g) {
+        g.setColor(new Color(205, 138, 78, 128));
+        g.fillRect(10, 80, bounds.width/2+20, 500);
+        g.fillRect(bounds.width/2+40, 80, bounds.width/2-60, 500);
+        g.setColor(Color.BLACK);
+        g.drawRect(10, 80, bounds.width/2+20, 500);
+        g.drawRect(bounds.width/2+40, 80, bounds.width/2-60, 500);
+        g.setFont(new Font("Arial", Font.BOLD, 40));
+        g.drawString("UNO!", bounds.width/2-40, 50);
+        g.setFont(new Font("Arial", Font.BOLD, 10));
+        g.drawString("Developed by Peter Mitchell (2021)", bounds.width/2-70, 65);
+        g.setFont(new Font("Arial", Font.BOLD, 40));
+        g.setColor(Card.getColourByID(0));
+        g.drawString("U", bounds.width/2-40+2, 48);
+        g.setColor(Card.getColourByID(1));
+        g.drawString("N", bounds.width/2-40+2+30, 48);
+        g.setColor(Card.getColourByID(2));
+        g.drawString("O", bounds.width/2-40+2+60, 48);
+        g.setColor(Card.getColourByID(3));
+        g.drawString("!", bounds.width/2-40+2+90, 48);
+    }
+
+    /**
+     * Draws the text for all the rule status messages.
+     *
+     * @param g Reference to the Graphics object for rendering.
+     */
+    private void drawRuleText(Graphics g) {
+        g.setFont(new Font("Arial", Font.BOLD, 30));
+        g.drawString("Rules", bounds.width/2+280, 120);
+        g.setFont(new Font("Arial", Font.BOLD, 20));
+        g.drawString(stackRuleStateStr, bounds.width/2+300, 175);
+        g.drawString(drawTillPlayableRuleStateStr, bounds.width/2+300, 225);
+        g.drawString(twoPlayerPrefixStr, bounds.width/2+140, 270);
+        g.drawString(twoPlayerRuleStr, bounds.width/2+300, 270);
+        g.drawString(sevenZeroRuleStr, bounds.width/2+300, 315);
+        g.drawString(jumpInRuleStr, bounds.width/2+300, 365);
+        g.drawString(forcedPlayRuleStr, bounds.width/2+300, 415);
+        g.drawString(noBluffingRuleStr, bounds.width/2+300, 465);
+        g.drawString(scoreLimitStr, bounds.width/2+300, 515);
     }
 
     /**
@@ -141,7 +206,7 @@ public class LobbyInterface extends WndInterface {
         });
         playerList.forEach(lobbyPlayer -> {
             if (lobbyPlayer.isPositionInside(mousePosition))
-                lobbyPlayer.iterateStrategy();
+                lobbyPlayer.handleClick();
         });
     }
 
@@ -156,6 +221,12 @@ public class LobbyInterface extends WndInterface {
             case 2 -> gamePanel.startGame(playerList, ruleSet);
             case 3 -> toggleStackRule();
             case 4 -> toggleDrawTillCanPlayRule();
+            case 5 -> toggleSevenZeroRule();
+            case 6 -> toggleJumpInRule();
+            case 7 -> toggleForcedPlayRule();
+            case 8 -> toggleNoBluffingRule();
+            case 9 -> cycleScoreLimit();
+            case 10 -> resetRulesToDefault();
         }
     }
 
@@ -163,9 +234,18 @@ public class LobbyInterface extends WndInterface {
      * Toggles player 2 and 3 between enabled and disabled states.
      */
     private void toggleNumberOfPlayers() {
-        playerList.get(2).setEnabled(!playerList.get(2).isEnabled());
-        playerList.get(3).setEnabled(!playerList.get(3).isEnabled());
         ruleSet.setTwoPlayers(!ruleSet.getOnlyTwoPlayers());
+        updatePlayerNumberStatus();
+    }
+
+    /**
+     * Updates the visual status based on the number of players.
+     */
+    private void updatePlayerNumberStatus() {
+        playerList.get(2).setEnabled(!ruleSet.getOnlyTwoPlayers());
+        playerList.get(3).setEnabled(!ruleSet.getOnlyTwoPlayers());
+        twoPlayerPrefixStr = ruleSet.getOnlyTwoPlayers() ? "Two Players:" : "Four Players:";
+        twoPlayerRuleStr = ruleSet.getOnlyTwoPlayers() ? "Reverse is Skip" : "Normal Rules for Reverse";
     }
 
     /**
@@ -173,8 +253,14 @@ public class LobbyInterface extends WndInterface {
      */
     private void toggleStackRule() {
         ruleSet.setCanStackCards(!ruleSet.canStackCards());
-        stackRuleStateStr = "Stacking +2/+4: "
-                + (ruleSet.canStackCards() ? "On" : "Off");
+        updateStackRuleLabel();
+    }
+
+    /**
+     * Updates the text for the stack rule.
+     */
+    private void updateStackRuleLabel() {
+        stackRuleStateStr = "Stacking +2/+4: " + (ruleSet.canStackCards() ? "On" : "Off");
     }
 
     /**
@@ -182,7 +268,121 @@ public class LobbyInterface extends WndInterface {
      */
     private void toggleDrawTillCanPlayRule() {
         ruleSet.setDrawnTillCanPlay(!ruleSet.shouldDrawnTillCanPlay());
-        drawTillPlayableRuleStateStr = "Draw Till Can Play: "
-                + (ruleSet.shouldDrawnTillCanPlay() ? "On" : "Off");
+        updateDrawTillCanPlayRuleLabel();
+    }
+
+    /**
+     * Updates the text for the draw till can play rule.
+     */
+    private void updateDrawTillCanPlayRuleLabel() {
+        drawTillPlayableRuleStateStr = "Draw Till Can Play: " + (ruleSet.shouldDrawnTillCanPlay() ? "On" : "Off");
+    }
+
+    /**
+     * Toggles the seven-zero rule and updates the message.
+     */
+    private void toggleSevenZeroRule() {
+        ruleSet.setSevenZeroRule(!ruleSet.getSevenZeroRule());
+        updateSevenZeroRuleLabel();
+    }
+
+    /**
+     * Updates the text for the seven-zero rule.
+     */
+    private void updateSevenZeroRuleLabel() {
+        sevenZeroRuleStr = "Seven-0: " + (ruleSet.getSevenZeroRule() ? "On (7=Swap, 0=Pass All)" : "Off");
+    }
+
+    /**
+     * Toggles the forced play rule and updates the message.
+     */
+    private void toggleForcedPlayRule() {
+        ruleSet.setForcedPlayRule(!ruleSet.getForcedPlayRule());
+        updateForcedPlayRuleLabel();
+    }
+
+    /**
+     * Updates the text for the forced play rule.
+     */
+    private void updateForcedPlayRuleLabel() {
+        forcedPlayRuleStr = "Forced Play: " + (ruleSet.getForcedPlayRule() ? "On" : "Off") + "(Not Imp)";
+    }
+
+    /**
+     * Toggles the Jump-In rule and updates the message.
+     */
+    private void toggleJumpInRule() {
+        ruleSet.setAllowJumpInRule(!ruleSet.allowJumpInRule());
+        updateJumpInRuleLabel();
+    }
+
+    /**
+     * Updates the text for the jump in rule.
+     */
+    private void updateJumpInRuleLabel() {
+        jumpInRuleStr = "Jump In: " + (ruleSet.allowJumpInRule() ? "On" : "Off") + "(Not Imp)";
+    }
+
+    /**
+     * Toggles the No Bluffing rule and updates the message.
+     */
+    private void toggleNoBluffingRule() {
+        ruleSet.setNoBuffingRule(!ruleSet.getNoBluffingRule());
+        updateNoBuffingRuleLabel();
+    }
+
+    private void updateNoBuffingRuleLabel() {
+        noBluffingRuleStr = "No Bluffing: " + (ruleSet.getNoBluffingRule() ? "On" : "Off") + "(Not Imp)";
+    }
+
+    /**
+     * Cycles between the options for score limit
+     */
+    private void cycleScoreLimit() {
+        switch(ruleSet.getScoreLimitType()) {
+            case OneRound -> ruleSet.setScoreLimitType(RuleSet.ScoreLimitType.Score200);
+            case Score200 -> ruleSet.setScoreLimitType(RuleSet.ScoreLimitType.Score300);
+            case Score300 -> ruleSet.setScoreLimitType(RuleSet.ScoreLimitType.Score500);
+            case Score500 -> ruleSet.setScoreLimitType(RuleSet.ScoreLimitType.Unlimited);
+            case Unlimited -> ruleSet.setScoreLimitType(RuleSet.ScoreLimitType.OneRound);
+        }
+        updateScoreLimitLabel();
+    }
+
+    /**
+     * Updates the label to show a message related to the score.
+     */
+    private void updateScoreLimitLabel() {
+        String scoreLabelMessage = "";
+        switch(ruleSet.getScoreLimitType()) {
+            case OneRound -> scoreLabelMessage = "One Round";
+            case Score200 -> scoreLabelMessage = "200 Points";
+            case Score300 -> scoreLabelMessage = "300 Points";
+            case Score500 -> scoreLabelMessage = "500 Points";
+            case Unlimited -> scoreLabelMessage = "Unlimited";
+        }
+        scoreLimitStr = "Score Limit: " + scoreLabelMessage;
+    }
+
+    /**
+     * Resets all rules to defaults.
+     */
+    private void resetRulesToDefault() {
+        ruleSet.setToDefaults();
+        updateAllRuleLabels();
+    }
+
+    /**
+     * Updates the state of all labels.
+     */
+    private void updateAllRuleLabels() {
+        updateStackRuleLabel();
+        updateDrawTillCanPlayRuleLabel();
+        updatePlayerNumberStatus();
+        updateSevenZeroRuleLabel();
+        updateJumpInRuleLabel();
+        updateForcedPlayRuleLabel();
+        updateNoBuffingRuleLabel();
+        updateScoreLimitLabel();
     }
 }
