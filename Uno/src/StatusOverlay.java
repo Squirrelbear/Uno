@@ -62,12 +62,15 @@ public class StatusOverlay extends WndInterface implements TurnDecisionOverlayIn
      */
     @Override
     public void paint(Graphics g) {
-        g.setColor(Color.BLACK);
         g.setFont(statusFont);
         int strWidth = g.getFontMetrics().stringWidth(statusText);
+        g.setColor(new Color(184, 154, 143, 204));
+        g.fillRect(centre.x-strWidth/2-10, centre.y-65, strWidth+20, 60);
+        g.setColor(Color.BLACK);
         g.drawString(statusText, centre.x-strWidth/2, centre.y-20);
-        g.setColor(timeOut < 6 ? Color.RED : Color.YELLOW);
         strWidth = g.getFontMetrics().stringWidth(timeOutStr);
+        g.drawString(timeOutStr, centre.x-strWidth/2-2, centre.y-40+2);
+        g.setColor(timeOut < 6 ? Color.RED : Color.YELLOW);
         g.drawString(timeOutStr, centre.x-strWidth/2, centre.y-40);
     }
 
