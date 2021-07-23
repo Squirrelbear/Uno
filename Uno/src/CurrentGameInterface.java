@@ -24,11 +24,6 @@ public class CurrentGameInterface extends WndInterface {
      */
     private final List<Card> recentCards;
     /**
-     * The maximum number of cards kept in recentCards.
-     */
-    private final int MAX_CARD_HISTORY = 10;
-
-    /**
      * The centre of where to place recent cards.
      */
     private final Position centredCardPos;
@@ -89,23 +84,39 @@ public class CurrentGameInterface extends WndInterface {
     }
 
     /**
-     * Initialise the interface with bounds and make it enabled.
+     * Initialise the interface with bounds and make it enabled. Use this version when coming from the Lobby for
+     * a new set of rounds.
      *
      * @param bounds The bounds of the interface.
+     * @param ruleSet The rules definition for how the game is to be played.
      * @param lobbyPlayers Players to create in the game.
+     */
+    public CurrentGameInterface(Rectangle bounds, RuleSet ruleSet, List<LobbyPlayer> lobbyPlayers) {
+        this(bounds, createPlayersFromLobby(lobbyPlayers, bounds), ruleSet);
+    }
+
+    /**
+     * Initialise the interface with bounds and make it enabled. Use this version when coming from
+     * after a game has already been completed and the sequence of games is continuing.
+     *
+     * @param bounds The bounds of the interface.
+     * @param playerList Players to create in the game.
      * @param ruleSet The rules definition for how the game is to be played.
      */
-    public CurrentGameInterface(Rectangle bounds, List<LobbyPlayer> lobbyPlayers, RuleSet ruleSet) {
+    public CurrentGameInterface(Rectangle bounds, List<Player> playerList, RuleSet ruleSet) {
         super(bounds);
         activeSingleton = this;
-        players = new ArrayList<>();
         this.ruleSet = ruleSet;
         deck = new Deck(new Position(100,100));
         recentCards = new ArrayList<>();
         centredCardPos = new Position(bounds.position.x+bounds.width/2-30,bounds.position.y+bounds.height/2-45);
 
-        createPlayers(lobbyPlayers);
+        this.players = playerList;
+        bottomPlayer = players.get(0);
         for (Player player : players) {
+            if(player.getPlayerType() == Player.PlayerType.ThisPlayer) {
+                bottomPlayer = player;
+            }
             for(int i = 0; i < 7; i++) {
                 player.addCardToHand(deck.drawCard());
             }
@@ -366,6 +377,7 @@ public class CurrentGameInterface extends WndInterface {
         card.position.setPosition(centredCardPos.x, centredCardPos.y);
         card.position.add(new Position((int)(Math.random()*24-12),(int)(Math.random()*24-12)));
         recentCards.add(card);
+        int MAX_CARD_HISTORY = 10;
         if(recentCards.size() > MAX_CARD_HISTORY) {
             recentCards.remove(0);
         }
@@ -448,12 +460,14 @@ public class CurrentGameInterface extends WndInterface {
      * Generates a list of players using the specified types. Requires a single ThisPlayer and 1 or 3 AIPlayer.
      *
      * @param playerList A list of player data to generate a collection.
+     * @param bounds The bounds to use for calculating offsets and regions.
      */
-    private void createPlayers(List<LobbyPlayer> playerList) {
+    private static List<Player> createPlayersFromLobby(List<LobbyPlayer> playerList, Rectangle bounds) {
+        List<Player> result = new ArrayList<>();
         List<LobbyPlayer> playersToAdd = playerList.stream().filter(LobbyPlayer::isEnabled).collect(Collectors.toList());
         if(playersToAdd.size() != 2 && playersToAdd.size() != 4) {
             System.out.println("Critical Error. Only combinations of 2 or 4 players are allowed");
-            return;
+            return result;
         }
         int thisPlayerIndex = -1;
         for(int i = 0; i < playersToAdd.size(); i++) {
@@ -462,40 +476,41 @@ public class CurrentGameInterface extends WndInterface {
                     thisPlayerIndex = i;
                 } else {
                     System.out.println("Critical Error. Only one ThisPlayer is allowed.");
-                    return;
+                    return result;
                 }
             }
         }
         if(thisPlayerIndex == -1) {
             System.out.println("Critical Error. One ThisPlayer is required!");
-            return;
+            return result;
         }
 
         for (int i = 0; i < playersToAdd.size(); i++) {
             Rectangle playerRegion;
             if(playersToAdd.size() == 4) {
-                playerRegion = getPlayerRect((i + 4 - thisPlayerIndex) % 4);
+                playerRegion = getPlayerRect((i + 4 - thisPlayerIndex) % 4, bounds);
             } else {
-                playerRegion = getPlayerRect(playersToAdd.get(i).getPlayerType() == Player.PlayerType.ThisPlayer ? 0 : 2);
+                playerRegion = getPlayerRect(playersToAdd.get(i).getPlayerType() == Player.PlayerType.ThisPlayer ? 0 : 2, bounds);
             }
             if(playersToAdd.get(i).getPlayerType() == Player.PlayerType.AIPlayer) {
-                players.add(new AIPlayer(i, playersToAdd.get(i).getPlayerName(), playerRegion, playersToAdd.get(i).getAIStrategy()));
+                result.add(new AIPlayer(i, playersToAdd.get(i).getPlayerName(), playerRegion, playersToAdd.get(i).getAIStrategy()));
             } else {
-                players.add(new Player(i, playersToAdd.get(i).getPlayerName(), playersToAdd.get(i).getPlayerType(), playerRegion));
+                result.add(new Player(i, playersToAdd.get(i).getPlayerName(), playersToAdd.get(i).getPlayerType(), playerRegion));
             }
         }
-        bottomPlayer = players.get(thisPlayerIndex);
+        return result;
     }
 
     /**
      * Generates bounds for where a player's cards should be placed.
      *
      * @param direction 0=bottom, 1=left, 2=top, 3=right
+     * @param bounds The bounds to use for calculating offsets and regions.
      * @return A Rectangle defining where the player should have their cards on the field.
      */
-    private Rectangle getPlayerRect(int direction) {
+    private static Rectangle getPlayerRect(int direction, Rectangle bounds) {
         return switch (direction) {
-            case 1 -> new Rectangle(bounds.position.x,//(Card.CARD_WIDTH + 4) * 6 / 2 + 50,
+            case 1 -> new Rectangle(bounds.position.x,
                     bounds.position.y + bounds.height / 2-150,
                     (Card.CARD_WIDTH + 4) * 6, bounds.height / 2 - 100 - 10);
             case 2 -> new Rectangle(bounds.position.x + bounds.width / 2 - (Card.CARD_WIDTH + 4) * 15 / 2,

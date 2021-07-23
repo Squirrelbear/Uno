@@ -63,7 +63,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
      * @param ruleSet Definition of how the game is to be played.
      */
     public void startGame(List<LobbyPlayer> playerList, RuleSet ruleSet) {
-        activeGame = new CurrentGameInterface(new Rectangle(0,0,PANEL_WIDTH,PANEL_HEIGHT), playerList, ruleSet);
+        activeGame = new CurrentGameInterface(new Rectangle(0,0,PANEL_WIDTH,PANEL_HEIGHT), ruleSet, playerList);
         lobbyInterface = null;
     }
 
