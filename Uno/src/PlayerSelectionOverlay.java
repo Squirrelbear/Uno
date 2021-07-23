@@ -34,7 +34,7 @@ public class PlayerSelectionOverlay extends WndInterface implements TurnDecision
         for(int i = 0; i < playerList.size(); i++) {
             if(playerList.get(i).getPlayerType() != Player.PlayerType.ThisPlayer) {
                 Position centre = playerList.get(i).getCentreOfBounds();
-                buttonList.add(new Button(new Position(centre.x-100,centre.y-20), 200, 40, "Choose Player",i+1));
+                buttonList.add(new Button(new Position(centre.x-100,centre.y-20), 200, 40, "Choose Player",i));
             }
         }
     }

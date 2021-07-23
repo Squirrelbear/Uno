@@ -680,16 +680,16 @@ public class TurnActionFactory {
     private static void swapHandWithOther(Map<String, Integer> storedData) {
         int targetPlayerID = storedData.get("otherPlayer");
         Player targetPlayer = CurrentGameInterface.getCurrentGame().getPlayerByID(targetPlayerID);
-        Card[] targetPlayerHand = (Card[])targetPlayer.getHand().toArray();
+        Object[] targetPlayerHand = targetPlayer.getHand().toArray();
         targetPlayer.emptyHand();
         Player currentPlayer = CurrentGameInterface.getCurrentGame().getCurrentPlayer();
-        Card[] currentPlayerHand = (Card[])currentPlayer.getHand().toArray();
+        Object[] currentPlayerHand = currentPlayer.getHand().toArray();
         currentPlayer.emptyHand();
-        for(Card card : targetPlayerHand) {
-            currentPlayer.addCardToHand(card);
+        for(Object card : targetPlayerHand) {
+            currentPlayer.addCardToHand((Card)card);
         }
-        for(Card card : currentPlayerHand) {
-            targetPlayer.addCardToHand(card);
+        for(Object card : currentPlayerHand) {
+            targetPlayer.addCardToHand((Card)card);
         }
     }
 
@@ -700,28 +700,28 @@ public class TurnActionFactory {
      * @param storedData Reference to the shared stored data to be used for passing on to all the TurnAction sequence.
      */
     private static void passAllHands(Map<String, Integer> storedData) {
-        List<Card[]> hands = new ArrayList<>();
+        List<Object[]> hands = new ArrayList<>();
         List<Player> players = CurrentGameInterface.getCurrentGame().getAllPlayers();
         for(Player player : players) {
-            hands.add((Card[])player.getHand().toArray());
+            hands.add(player.getHand().toArray());
             player.emptyHand();
         }
 
         // Shuffle the hands
         if(CurrentGameInterface.getCurrentGame().isIncreasing()) {
-            Card[] movedHand = hands.get(0);
+            Object[] movedHand = hands.get(0);
             hands.remove(0);
             hands.add(movedHand);
         } else {
-            Card[] movedHand = hands.get(hands.size()-1);
+            Object[] movedHand = hands.get(hands.size()-1);
             hands.remove(hands.size()-1);
             hands.add(0, movedHand);
         }
 
         // put all the cards into the hands again
         for(int playerID = 0; playerID < players.size(); playerID++) {
-            for(Card card : hands.get(playerID)) {
-                players.get(playerID).addCardToHand(card);
+            for(Object card : hands.get(playerID)) {
+                players.get(playerID).addCardToHand((Card)card);
             }
         }
     }

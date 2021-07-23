@@ -126,36 +126,56 @@ public class CurrentGameInterface extends WndInterface {
      */
     @Override
     public void update(int deltaTime) {
+        if(!isEnabled()) return;
+
         playDirectionAnimation.update(deltaTime);
         overlayManager.update(deltaTime);
+        updateTurnAction();
+        players.forEach(player -> player.update(deltaTime));
+        checkForEndOfRound();
+    }
+
+    /**
+     * Checks if there is currently a player who has won the game and initiates end game conditions once found.
+     */
+    private void checkForEndOfRound() {
+        for(Player player : players) {
+            if(player.getHand().size() == 0) {
+                // TODO Note need to hide all Overlays.
+                System.out.println(player.getPlayerName() + " won the game!");
+                int totalScore = 0;
+                for (int i = 0; i < players.size(); i++) {
+                    if (players.get(i) != player) {
+                        totalScore += players.get(i).getHandTotalScore();
+                        System.out.println("Player " + i + ": " + players.get(i).getHandTotalScore());
+                    }
+                }
+                System.out.println("Total score: " + totalScore);
+                setEnabled(false);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Updates the current turn action state by performing the action and then iterating to the next one if possible.
+     */
+    private void updateTurnAction() {
         if(currentTurnAction != null) {
-            if (currentTurnAction instanceof TurnActionFactory.TurnDecisionAction) {
+            // Tree Debug Output
+            /*if (currentTurnAction instanceof TurnActionFactory.TurnDecisionAction) {
                 if (!((TurnActionFactory.TurnDecisionAction) currentTurnAction).hasRunOnce) {
                     System.out.println(currentTurnAction.actionDebugText);
                 }
             } else {
                 System.out.println(currentTurnAction.actionDebugText);
-            }
+            }*/
             currentTurnAction.performAction();
             currentTurnAction = currentTurnAction.getNext();
             if(queuedTurnAction != null) {
                 currentTurnAction = queuedTurnAction;
                 queuedTurnAction = null;
             }
-        }
-
-        players.forEach(player -> player.update(deltaTime));
-
-        // TODO
-        if (bottomPlayer.getHand().size() == 0) {
-            int totalScore = 0;
-            for (int i = 0; i < players.size(); i++) {
-                if (players.get(i) != bottomPlayer) {
-                    totalScore += players.get(i).getHandTotalScore();
-                    System.out.println("Player " + i + ": " + players.get(i).getHandTotalScore());
-                }
-            }
-            System.out.println("Total score: " + totalScore);
         }
     }
 
