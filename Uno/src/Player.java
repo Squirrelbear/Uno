@@ -344,4 +344,12 @@ public class Player {
     public int getCurrentRoundScore() {
         return currentRoundScore;
     }
+
+    /**
+     * Resets the score back to nothing.
+     */
+    public void resetScore() {
+        totalScore = 0;
+        currentRoundScore = 0;
+    }
 }

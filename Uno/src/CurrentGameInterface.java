@@ -123,6 +123,8 @@ public class CurrentGameInterface extends WndInterface {
             if(player.getPlayerType() == Player.PlayerType.ThisPlayer) {
                 bottomPlayer = player;
             }
+            // Emptying hand is required just in case this is a continued sequence of rounds.
+            player.emptyHand();
             for(int i = 0; i < 7; i++) {
                 player.addCardToHand(deck.drawCard());
             }
@@ -270,6 +272,8 @@ public class CurrentGameInterface extends WndInterface {
             revealHands();
         } else if(keyCode == KeyEvent.VK_T) {
             toggleTurnDirection();
+        } else if(keyCode == KeyEvent.VK_E) {
+            bottomPlayer.emptyHand();
         }
     }
 
