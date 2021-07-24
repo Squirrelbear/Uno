@@ -113,9 +113,9 @@ public class CurrentGameInterface extends WndInterface {
         activeSingleton = this;
         this.ruleSet = ruleSet;
         this.gamePanel = gamePanel;
-        deck = new Deck(new Position(100,100));
         recentCards = new ArrayList<>();
         centredCardPos = new Position(bounds.position.x+bounds.width/2-30,bounds.position.y+bounds.height/2-45);
+        deck = new Deck(new Position(centredCardPos.x-160,centredCardPos.y));
 
         this.players = playerList;
         bottomPlayer = players.get(0);
@@ -507,15 +507,18 @@ public class CurrentGameInterface extends WndInterface {
 
         for (int i = 0; i < playersToAdd.size(); i++) {
             Rectangle playerRegion;
+            boolean showNameLeft;
             if(playersToAdd.size() == 4) {
                 playerRegion = getPlayerRect((i + 4 - thisPlayerIndex) % 4, bounds);
+                showNameLeft = (i + 4 - thisPlayerIndex) % 2 == 0;
             } else {
                 playerRegion = getPlayerRect(playersToAdd.get(i).getPlayerType() == Player.PlayerType.ThisPlayer ? 0 : 2, bounds);
+                showNameLeft = true;
             }
             if(playersToAdd.get(i).getPlayerType() == Player.PlayerType.AIPlayer) {
-                result.add(new AIPlayer(i, playersToAdd.get(i).getPlayerName(), playerRegion, playersToAdd.get(i).getAIStrategy()));
+                result.add(new AIPlayer(i, playersToAdd.get(i).getPlayerName(), playerRegion, playersToAdd.get(i).getAIStrategy(), showNameLeft));
             } else {
-                result.add(new Player(i, playersToAdd.get(i).getPlayerName(), playersToAdd.get(i).getPlayerType(), playerRegion));
+                result.add(new Player(i, playersToAdd.get(i).getPlayerName(), playersToAdd.get(i).getPlayerType(), playerRegion, showNameLeft));
             }
         }
         return result;
@@ -533,15 +536,15 @@ public class CurrentGameInterface extends WndInterface {
             case 1 -> new Rectangle(bounds.position.x,
                     bounds.position.y + bounds.height / 2-150,
                     (Card.CARD_WIDTH + 4) * 6, bounds.height / 2 - 100 - 10);
-            case 2 -> new Rectangle(bounds.position.x + bounds.width / 2 - (Card.CARD_WIDTH + 4) * 15 / 2,
-                    bounds.position.y,
-                    (Card.CARD_WIDTH + 4) * 15, bounds.height / 2 - 100 - 10);
+            case 2 -> new Rectangle(bounds.position.x + bounds.width / 2 - (Card.CARD_WIDTH + 4) * 10 / 2,
+                    bounds.position.y-30,
+                    (Card.CARD_WIDTH + 4) * 10, bounds.height / 2 - 100 - 10);
             case 3 -> new Rectangle(bounds.position.x +bounds.width- ((Card.CARD_WIDTH + 4) * 6 + 50)+50,
                     bounds.position.y + bounds.height / 2-150,
                     (Card.CARD_WIDTH + 4) * 6, bounds.height / 2 - 100 - 10);
-            default -> new Rectangle(bounds.position.x + bounds.width / 2 - (Card.CARD_WIDTH + 4) * 15 / 2,
-                    bounds.position.y + bounds.height / 2 + 100,
-                    (Card.CARD_WIDTH + 4) * 15, bounds.height / 2 - 100 - 10);
+            default -> new Rectangle(bounds.position.x + bounds.width / 2 - (Card.CARD_WIDTH + 4) * 10 / 2,
+                    bounds.position.y + bounds.height / 2 + 130,
+                    (Card.CARD_WIDTH + 4) * 10, bounds.height / 2 - 100 - 10);
         };
     }
 }

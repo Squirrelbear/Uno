@@ -40,9 +40,10 @@ public class AIPlayer extends Player {
      * @param playerName The name shown for this player.
      * @param bounds The region for placing cards within.
      * @param strategy The strategy the AI will use to play.
+     * @param showPlayerNameLeft When true, the player's name is centred to the left side of the bounds, otherwise it is centred on the top.
      */
-    public AIPlayer(int playerNumber, String playerName, Rectangle bounds, AIStrategy strategy) {
-        super(playerNumber, playerName, PlayerType.AIPlayer, bounds);
+    public AIPlayer(int playerNumber, String playerName, Rectangle bounds, AIStrategy strategy, boolean showPlayerNameLeft) {
+        super(playerNumber, playerName, PlayerType.AIPlayer, bounds, showPlayerNameLeft);
         if(strategy == AIStrategy.Random) {
             selectRandomStrategy();
         } else {

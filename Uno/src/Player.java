@@ -63,6 +63,10 @@ public class Player {
      * Necessary to store this because a score could be 0 is all other players only have 0s in their hands.
      */
     private boolean wonRound;
+    /**
+     * When true, the player's name is centred to the left side of the bounds, otherwise it is centred on the top.
+     */
+    private boolean showPlayerNameLeft;
 
     /**
      * Initialises the player with an empty hand and defaults to showing cards if
@@ -72,12 +76,14 @@ public class Player {
      * @param playerName The name for this player.
      * @param playerType The type of player. (ThisPlayer, AIPlayer, or NetworkPlayer).
      * @param bounds The region for drawing the player's cards.
+     * @param showPlayerNameLeft When true, the player's name is centred to the left side of the bounds, otherwise it is centred on the top.
      */
-    public Player(int playerID, String playerName, PlayerType playerType, Rectangle bounds) {
+    public Player(int playerID, String playerName, PlayerType playerType, Rectangle bounds, boolean showPlayerNameLeft) {
         this.playerName = playerName;
         this.playerID = playerID;
         this.playerType = playerType;
         this.bounds = bounds;
+        this.showPlayerNameLeft = showPlayerNameLeft;
         hand = new ArrayList<>();
         showCards = playerType == PlayerType.ThisPlayer;
         wonRound = false;
@@ -107,10 +113,12 @@ public class Player {
         g.setFont(new Font("Arial", Font.BOLD, 20));
         int strWidth = g.getFontMetrics().stringWidth(playerName);
         g.setColor(new Color(1,1,1, 204));
-        g.fillRect(bounds.position.x, bounds.position.y-40, strWidth+30, 40);
+        int nameXOffset = bounds.position.x + (showPlayerNameLeft ? -(strWidth-50) : (bounds.width/2-(strWidth+30)/2));
+        int nameYOffset = bounds.position.y + (showPlayerNameLeft ? (bounds.height/2-20) : -10);
+        g.fillRect(nameXOffset, nameYOffset, strWidth+30, 40);
         g.setColor(CurrentGameInterface.getCurrentGame().getCurrentPlayer().getPlayerID() == getPlayerID()
                 ? Color.ORANGE : Color.WHITE);
-        g.drawString(playerName, bounds.position.x+15, bounds.position.y-15);
+        g.drawString(playerName, nameXOffset+15, nameYOffset+25);
     }
 
     /**
@@ -310,6 +318,7 @@ public class Player {
             card.position.setPosition(bounds.position.x + rowXOffset + x*(Card.CARD_WIDTH+paddingX),
                                      startY + y*(Card.CARD_HEIGHT+paddingY) + hoverOffset);
             x++;
+            remainingElements--;
             // Check for iterating to the next row.
             if(x >= elementsPerRow) {
                 x = 0;
@@ -320,7 +329,6 @@ public class Player {
                     rowXOffset = bounds.width/2-(int)(remainingElements*(Card.CARD_WIDTH+paddingX)/2.0);
                 }
             }
-            remainingElements--;
         }
     }
 
