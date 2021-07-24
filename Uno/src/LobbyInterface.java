@@ -1,6 +1,10 @@
 import java.awt.*;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Uno
@@ -70,14 +74,15 @@ public class LobbyInterface extends WndInterface {
     public LobbyInterface(Rectangle bounds, GamePanel gamePanel) {
         super(bounds);
         this.gamePanel = gamePanel;
+        List<String> aiNames = getRandomAINameList();
         playerList = new ArrayList<>();
         playerList.add(new LobbyPlayer("Player", Player.PlayerType.ThisPlayer,
                 new Rectangle(new Position(20,100),bounds.width/2, 100)));
-        playerList.add(new LobbyPlayer("Player", Player.PlayerType.AIPlayer,
+        playerList.add(new LobbyPlayer(aiNames.get(0), Player.PlayerType.AIPlayer,
                 new Rectangle(new Position(20,100+120),bounds.width/2, 100)));
-        playerList.add(new LobbyPlayer("Player", Player.PlayerType.AIPlayer,
+        playerList.add(new LobbyPlayer(aiNames.get(1), Player.PlayerType.AIPlayer,
                 new Rectangle(new Position(20,100+120*2),bounds.width/2, 100)));
-        playerList.add(new LobbyPlayer("Player", Player.PlayerType.AIPlayer,
+        playerList.add(new LobbyPlayer(aiNames.get(2), Player.PlayerType.AIPlayer,
                 new Rectangle(new Position(20,100+120*3),bounds.width/2, 100)));
 
         buttonList = new ArrayList<>();
@@ -384,5 +389,24 @@ public class LobbyInterface extends WndInterface {
         updateForcedPlayRuleLabel();
         updateNoBuffingRuleLabel();
         updateScoreLimitLabel();
+    }
+
+    /**
+     * Loads a list of names from AINameList.txt and randomly sorts it ready for use.
+     *
+     * @return A list of names read in from the file.
+     */
+    private List<String> getRandomAINameList() {
+        List<String> names = new ArrayList<>();
+        try {
+            Scanner scan = new Scanner(new File("AINameList.txt"));
+            while(scan.hasNextLine()) {
+                names.add(scan.nextLine().trim());
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Failed to read name list. File not found.");
+        }
+        Collections.shuffle(names);
+        return names;
     }
 }
