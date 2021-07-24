@@ -292,7 +292,7 @@ public class LobbyInterface extends WndInterface {
      * Updates the text for the forced play rule.
      */
     private void updateForcedPlayRuleLabel() {
-        forcedPlayRuleStr = "Forced Play: " + (ruleSet.getForcedPlayRule() ? "On" : "Off") + "(Not Imp)";
+        forcedPlayRuleStr = "Forced Play: " + (ruleSet.getForcedPlayRule() ? "On" : "Off");
     }
 
     /**
@@ -319,7 +319,7 @@ public class LobbyInterface extends WndInterface {
     }
 
     private void updateNoBuffingRuleLabel() {
-        noBluffingRuleStr = "No Bluffing: " + (ruleSet.getNoBluffingRule() ? "On" : "Off") + "(Not Imp)";
+        noBluffingRuleStr = "No Bluffing: " + (ruleSet.getNoBluffingRule() ? "On" : "Off");
     }
 
     /**

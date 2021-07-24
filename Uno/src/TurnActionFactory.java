@@ -247,10 +247,12 @@ public class TurnActionFactory {
         TurnAction playCard = new TurnAction(null, storedData, TurnActionFactory::playCardAsActionFromData, "Play the Drawn Card");
         TurnDecisionAction keepOrPlay = new TurnDecisionAction(moveToNextTurn, playCard, true,
                 "keepOrPlay", storedData, TurnActionFactory::beginChoiceOverlay, "Keep Or Play Choice");
+        TurnDecisionAction isForcedPlay = new TurnDecisionAction(keepOrPlay, playCard, false,
+                "isForcedPlay", storedData, TurnActionFactory::checkForcedPlayRule, "Check if the Forced Play is enabled and force the play if so.");
         TurnAction keepDrawing = new TurnAction(null, storedData, TurnActionFactory::drawCardAsActionFromData, "Draw Another Card (Recursive Tree)");
         TurnDecisionAction drawTillCanPlay = new TurnDecisionAction(moveToNextTurn,keepDrawing,false,
                 "drawTillCanPlay?", storedData, TurnActionFactory::checkDrawTillCanPlayRule, "Check Draw Till Can Play Rule");
-        TurnDecisionAction canPlayCard = new TurnDecisionAction(drawTillCanPlay, keepOrPlay, false,
+        TurnDecisionAction canPlayCard = new TurnDecisionAction(drawTillCanPlay, isForcedPlay, false,
                 "cardPlayable", storedData, TurnActionFactory::isCardPlayable, "Check is the Card Playable");
         return new TurnAction(canPlayCard, storedData, TurnActionFactory::drawCard, "Draw a Card");
     }
@@ -339,7 +341,7 @@ public class TurnActionFactory {
                 false, "couldPreviousPlayCard", storedData, TurnActionFactory::showChallengeResult, "Could the Previous Player Have played a Card? (No Action)");
         TurnDecisionAction isChallenging = new TurnDecisionAction(isChainingCard, couldPreviousPlayCard, true,
                 "isChallenging", storedData, TurnActionFactory::beginChoiceOverlay, "Ask if the player wants to Challenge, Stack, or Do Nothing");
-        TurnDecisionAction canChallengeOrStack = new TurnDecisionAction(increaseDrawBy4, isChallenging, true,
+        TurnDecisionAction canChallengeOrStack = new TurnDecisionAction(increaseDrawBy4, isChallenging, false,
                 "canChallenge", storedData, TurnActionFactory::checkNoBluffingRule, "Check if a Challenge is allowed or if there is a card to Stack");
         TurnAction moveToNextTurn = new TurnAction(canChallengeOrStack, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
         TurnAction setTopOfPileColour = new TurnAction(moveToNextTurn, storedData, TurnActionFactory::setTopPileColour, "Change the Colour on Top of Pile");
@@ -745,7 +747,7 @@ public class TurnActionFactory {
     }
 
     /**
-     * Shows either a tick or cross overlay on the player who challenged.
+     * Checks the conditions for whether a challenge is allowed or if there is also an allowed +4 stack option too.
      *
      * @param storedData Reference to the shared stored data to be used for passing on to all the TurnAction sequence.
      */
@@ -757,5 +759,14 @@ public class TurnActionFactory {
         boolean canChallenge = canBluff || (canStack && hasAPlus4);
 
         storedData.put("canChallenge",canChallenge ? 1 : 0);
+    }
+
+    /**
+     * Checks the forced play rule.
+     *
+     * @param storedData Reference to the shared stored data to be used for passing on to all the TurnAction sequence.
+     */
+    private static void checkForcedPlayRule(Map<String, Integer> storedData) {
+        storedData.put("isForcedPlay", CurrentGameInterface.getCurrentGame().getRuleSet().getForcedPlayRule() ? 1 : 0);
     }
 }
