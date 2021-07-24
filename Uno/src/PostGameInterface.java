@@ -28,7 +28,22 @@ public class PostGameInterface extends WndInterface {
      * Reference to the GamePanel for exiting the interface.
      */
     private final GamePanel gamePanel;
-    private List<String> playerStrings;
+    /**
+     * Strings to cache the String generation for the player list.
+     */
+    private final List<String> playerStrings;
+    /**
+     * Winner for this round, and possibly the entire match.
+     */
+    private String roundWinnerStr;
+    /**
+     * When true, the score limit has been reached showing an extra message.
+     */
+    private boolean scoreLimitReached;
+    /**
+     * A String showing the score limit rule.
+     */
+    private String scoreLimitStr;
 
     /**
      * Initialise the interface with bounds and make it enabled.
@@ -41,18 +56,44 @@ public class PostGameInterface extends WndInterface {
         this.ruleSet = ruleSet;
         this.gamePanel = gamePanel;
 
-        buttonList = new ArrayList<>();
-        buttonList.add(new Button(new Position(bounds.width/2-125-250-20,620), 250, 40,
-                "Return to Lobby",1));
-        buttonList.add(new Button(new Position(bounds.width/2-125,620), 250, 40,
-                "Continue Next Round",2));
-        buttonList.add(new Button(new Position(bounds.width/2+125+20,620), 250, 40,
-                "New Game Same Settings",3));
-
         playerStrings = new ArrayList<>();
         for(Player player : playerList) {
             playerStrings.add((player.getPlayerType() == Player.PlayerType.ThisPlayer ? "You: " : "AI: ")
                     + player.getPlayerName());
+            if(player.getWon()) {
+                roundWinnerStr = player.getPlayerName();
+                switch(ruleSet.getScoreLimitType()) {
+                    case OneRound -> scoreLimitReached = true;
+                    case Score200 -> scoreLimitReached = player.getTotalScore() >= 200;
+                    case Score300 -> scoreLimitReached = player.getTotalScore() >= 300;
+                    case Score500 -> scoreLimitReached = player.getTotalScore() >= 500;
+                    case Unlimited -> scoreLimitReached = false;
+                }
+            }
+        }
+
+        scoreLimitStr = "Score Limit: ";
+        switch(ruleSet.getScoreLimitType()) {
+            case OneRound -> scoreLimitStr += "One Round";
+            case Score200 -> scoreLimitStr += "200 Points";
+            case Score300 -> scoreLimitStr += "300 Points";
+            case Score500 -> scoreLimitStr += "500 Points";
+            case Unlimited -> scoreLimitStr += "Unlimited";
+        }
+
+        buttonList = new ArrayList<>();
+        if(scoreLimitReached) {
+            buttonList.add(new Button(new Position(bounds.width / 2 - 250 - 10, 620), 250, 40,
+                    "Return to Lobby", 1));
+            buttonList.add(new Button(new Position(bounds.width / 2 + 10, 620), 250, 40,
+                    "New Game Same Settings", 3));
+        } else {
+            buttonList.add(new Button(new Position(bounds.width / 2 - 125 - 250 - 20, 620), 250, 40,
+                    "Return to Lobby", 1));
+            buttonList.add(new Button(new Position(bounds.width / 2 - 125, 620), 250, 40,
+                    "Continue Next Round", 2));
+            buttonList.add(new Button(new Position(bounds.width / 2 + 125 + 20, 620), 250, 40,
+                    "New Game Same Settings", 3));
         }
     }
 
@@ -75,6 +116,10 @@ public class PostGameInterface extends WndInterface {
     public void paint(Graphics g) {
         drawBackground(g);
         gamePanel.paintUnoTitle(g, bounds);
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.BOLD, 40));
+        int strWidth = g.getFontMetrics().stringWidth("Post-Game Summary");
+        g.drawString("Post-Game Summary", bounds.width/2-strWidth/2, 120);
         drawPlayers(g);
 
         buttonList.forEach(button -> button.paint(g));
@@ -101,8 +146,26 @@ public class PostGameInterface extends WndInterface {
     private void drawPlayers(Graphics g) {
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 20));
+        g.drawLine(bounds.width/4 + 10, 200, bounds.width*3/4-10, 200);
+        g.drawString("Round Score", bounds.width/2-10, 180);
+        g.drawString("Total Score", bounds.width/2+170, 180);
         for(int i = 0; i < players.size(); i++) {
-            g.drawString(playerStrings.get(i), bounds.width/4 + 20, 120+i*50);
+            g.drawLine(bounds.width/4 + 10, 260+i*60, bounds.width*3/4-10, 260+i*60);
+            g.drawString(playerStrings.get(i), bounds.width/4 + 50, 240+i*60);
+            g.drawString(players.get(i).getCurrentRoundScore()+"", bounds.width/2, 240+i*60);
+            g.drawString(players.get(i).getTotalScore()+"", bounds.width/2+180, 240+i*60);
+        }
+        g.drawLine(bounds.width/4 + 10, 200, bounds.width/4 + 10, 200+players.size()*60);
+        g.drawLine(bounds.width/2 -40, 150, bounds.width/2 -40, 200+players.size()*60);
+        g.drawLine(bounds.width/2+130, 150, bounds.width/2+130, 200+players.size()*60);
+        g.drawLine(bounds.width*3/4-10, 150, bounds.width*3/4-10, 200+players.size()*60);
+        g.drawLine(bounds.width/2 -40, 150, bounds.width*3/4-10, 150);
+
+        g.drawString("Round Winner: ", bounds.width/4 + 25, 490);
+        g.drawString(roundWinnerStr, bounds.width/4 + 175, 490);
+        g.drawString(scoreLimitStr, bounds.width/2+20, 490);
+        if(scoreLimitReached) {
+            g.drawString("Score limit reached!", bounds.width/2+40, 530);
         }
     }
 
@@ -149,7 +212,7 @@ public class PostGameInterface extends WndInterface {
      * Wipes the score of all players and then starts a new game.
      */
     private void startNewGameWithSameSettings() {
-        players.forEach(player -> player.resetScore());
+        players.forEach(Player::resetScore);
         gamePanel.startNextRound(players, ruleSet);
     }
 }

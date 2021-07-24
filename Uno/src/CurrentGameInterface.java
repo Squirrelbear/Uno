@@ -76,7 +76,7 @@ public class CurrentGameInterface extends WndInterface {
     /**
      * Reference to GamePanel for when the game ends.
      */
-    private GamePanel gamePanel;
+    private final GamePanel gamePanel;
 
     /**
      * Gets the current single instance of CurrentGameInterface. This is not enforced, but
@@ -161,13 +161,14 @@ public class CurrentGameInterface extends WndInterface {
         for(Player player : players) {
             if(player.getHand().size() == 0) {
                 int totalScore = 0;
-                for (int i = 0; i < players.size(); i++) {
-                    if (players.get(i) != player) {
-                        players.get(i).setCurrentRoundScore(0);
-                        totalScore += players.get(i).getHandTotalScore();
+                for (Player value : players) {
+                    if (value != player) {
+                        value.setCurrentRoundScore(0);
+                        totalScore += value.getHandTotalScore();
                     }
                 }
                 player.setCurrentRoundScore(totalScore);
+                player.setWon();
                 gamePanel.showPostGame(players, ruleSet);
                 return;
             }

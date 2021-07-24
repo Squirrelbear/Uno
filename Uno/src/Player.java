@@ -58,6 +58,11 @@ public class Player {
      * The score for a single round for this player.
      */
     private int currentRoundScore;
+    /**
+     * When true this player won the current round.
+     * Necessary to store this because a score could be 0 is all other players only have 0s in their hands.
+     */
+    private boolean wonRound;
 
     /**
      * Initialises the player with an empty hand and defaults to showing cards if
@@ -75,6 +80,8 @@ public class Player {
         this.bounds = bounds;
         hand = new ArrayList<>();
         showCards = playerType == PlayerType.ThisPlayer;
+        wonRound = false;
+        totalScore = currentRoundScore = 0;
     }
 
     /**
@@ -323,8 +330,26 @@ public class Player {
      * @param newCurrentRoundScore New score for this player.
      */
     public void setCurrentRoundScore(int newCurrentRoundScore) {
-        this.currentRoundScore = currentRoundScore;
+        this.currentRoundScore = newCurrentRoundScore;
         totalScore += currentRoundScore;
+    }
+
+    /**
+     * Sets the won state to true.
+     *
+     * @return When true, this player won the game.
+     */
+    public void setWon() {
+        wonRound = true;
+    }
+
+    /**
+     * This returns true when this player has won.
+     *
+     * @return The current won state.
+     */
+    public boolean getWon() {
+        return wonRound;
     }
 
     /**
@@ -351,5 +376,6 @@ public class Player {
     public void resetScore() {
         totalScore = 0;
         currentRoundScore = 0;
+        wonRound = false;
     }
 }
