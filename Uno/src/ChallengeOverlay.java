@@ -40,7 +40,10 @@ public class ChallengeOverlay extends WndInterface implements TurnDecisionOverla
         setEnabled(false);
         buttonList = new ArrayList<>();
         Position centre = bounds.getCentre();
-        buttonList.add(new Button(new Position(centre.x-150,centre.y+100), 100, 40, "Challenge", 1));
+        // If bluffing is allowed include the challenge button.
+        if(!CurrentGameInterface.getCurrentGame().getRuleSet().getNoBluffingRule()) {
+            buttonList.add(new Button(new Position(centre.x - 150, centre.y + 100), 100, 40, "Challenge", 1));
+        }
         buttonList.add(new Button(new Position(centre.x+50,centre.y+100), 100, 40, "Decline", 0));
 
         allowStacking = CurrentGameInterface.getCurrentGame().getRuleSet().canStackCards();

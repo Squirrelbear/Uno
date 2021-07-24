@@ -327,7 +327,8 @@ public class TurnActionFactory {
         TurnAction drawNCards = new TurnAction(moveToNextSkipDamagedPlayer, storedData, TurnActionFactory::drawNCards, "Draw N Number Cards");
         TurnAction increaseDrawBy4 = new TurnAction(drawNCards, storedData, TurnActionFactory::increaseDrawCountBy4, "Increase N (drawCount) by 4");
         TurnAction playCardAsResponse = new TurnAction(null, storedData, TurnActionFactory::playCardAsActionFromData, "Stack +4 on Previous (Recursive)");
-        TurnDecisionAction isChainingCard = new TurnDecisionAction(increaseDrawBy4, playCardAsResponse,
+        TurnAction increaseDrawBy4ThenStack = new TurnAction(playCardAsResponse, storedData, TurnActionFactory::increaseDrawCountBy4, "Increase N (drawCount) by 4");
+        TurnDecisionAction isChainingCard = new TurnDecisionAction(increaseDrawBy4, increaseDrawBy4ThenStack,
                 false, "isChaining", storedData, null, "No Action");
         TurnAction drawNCardsAndDoNothing = new TurnAction(null, storedData, TurnActionFactory::drawNCards, "Draw N Number Cards");
         TurnAction moveBackToNext = new TurnAction(drawNCardsAndDoNothing, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
@@ -338,7 +339,9 @@ public class TurnActionFactory {
                 false, "couldPreviousPlayCard", storedData, TurnActionFactory::showChallengeResult, "Could the Previous Player Have played a Card? (No Action)");
         TurnDecisionAction isChallenging = new TurnDecisionAction(isChainingCard, couldPreviousPlayCard, true,
                 "isChallenging", storedData, TurnActionFactory::beginChoiceOverlay, "Ask if the player wants to Challenge, Stack, or Do Nothing");
-        TurnAction moveToNextTurn = new TurnAction(isChallenging, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
+        TurnDecisionAction canChallengeOrStack = new TurnDecisionAction(increaseDrawBy4, isChallenging, true,
+                "canChallenge", storedData, TurnActionFactory::checkNoBluffingRule, "Check if a Challenge is allowed or if there is a card to Stack");
+        TurnAction moveToNextTurn = new TurnAction(canChallengeOrStack, storedData, TurnActionFactory::moveNextTurn, "Move to Next Turn");
         TurnAction setTopOfPileColour = new TurnAction(moveToNextTurn, storedData, TurnActionFactory::setTopPileColour, "Change the Colour on Top of Pile");
         TurnDecisionAction chooseWildColour = new TurnDecisionAction(setTopOfPileColour, setTopOfPileColour,
                 true, "wildColour", storedData, TurnActionFactory::beginChoiceOverlay, "Ask player for a Colour Choice");
@@ -739,5 +742,20 @@ public class TurnActionFactory {
             CurrentGameInterface.getCurrentGame().showGeneralOverlay(
                     "ChallengeSuccess"+CurrentGameInterface.getCurrentGame().getCurrentPlayer().getPlayerID());
         }
+    }
+
+    /**
+     * Shows either a tick or cross overlay on the player who challenged.
+     *
+     * @param storedData Reference to the shared stored data to be used for passing on to all the TurnAction sequence.
+     */
+    private static void checkNoBluffingRule(Map<String, Integer> storedData) {
+        boolean canStack = CurrentGameInterface.getCurrentGame().getRuleSet().canStackCards();
+        boolean hasAPlus4 = CurrentGameInterface.getCurrentGame().getCurrentPlayer().getHand().stream().anyMatch(card -> card.getFaceValueID() == 13);
+        boolean canBluff = !CurrentGameInterface.getCurrentGame().getRuleSet().getNoBluffingRule();
+
+        boolean canChallenge = canBluff || (canStack && hasAPlus4);
+
+        storedData.put("canChallenge",canChallenge ? 1 : 0);
     }
 }

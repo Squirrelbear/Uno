@@ -66,7 +66,7 @@ public class Player {
     /**
      * When true, the player's name is centred to the left side of the bounds, otherwise it is centred on the top.
      */
-    private boolean showPlayerNameLeft;
+    private final boolean showPlayerNameLeft;
 
     /**
      * Initialises the player with an empty hand and defaults to showing cards if
@@ -344,8 +344,6 @@ public class Player {
 
     /**
      * Sets the won state to true.
-     *
-     * @return When true, this player won the game.
      */
     public void setWon() {
         wonRound = true;
