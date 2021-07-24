@@ -123,12 +123,6 @@ public class PostGameInterface extends WndInterface {
         drawPlayers(g);
 
         buttonList.forEach(button -> button.paint(g));
-
-        // Pause overlay
-        if(!isEnabled()) {
-            g.setColor(new Color(144, 143, 143, 204));
-            g.fillRect(bounds.position.x, bounds.position.y, bounds.width, bounds.height);
-        }
     }
 
     /**
@@ -143,6 +137,11 @@ public class PostGameInterface extends WndInterface {
         g.drawRect(bounds.width/4, 80, bounds.width/2, 500);
     }
 
+    /**
+     * Draws all the player related elements including lines for the grid showing player stats.
+     *
+     * @param g Reference to the Graphics object for rendering.
+     */
     private void drawPlayers(Graphics g) {
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 20));

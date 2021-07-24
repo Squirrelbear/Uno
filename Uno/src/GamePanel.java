@@ -17,11 +17,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     /**
      * Height of the panel.
      */
-    private static final int PANEL_HEIGHT = 720;
+    public static final int PANEL_HEIGHT = 720;
     /**
      * Width of the panel.
      */
-    private static final int PANEL_WIDTH = 1280;
+    public static final int PANEL_WIDTH = 1280;
 
     /**
      * Reference to the window that appears when the game is paused.

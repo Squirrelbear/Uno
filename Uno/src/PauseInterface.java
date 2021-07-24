@@ -56,6 +56,10 @@ public class PauseInterface extends WndInterface {
      */
     @Override
     public void paint(Graphics g) {
+        // grey out everything behind the pause interface
+        g.setColor(new Color(144, 143, 143, 204));
+        g.fillRect(0, 0, GamePanel.PANEL_WIDTH, GamePanel.PANEL_HEIGHT);
+
         g.setColor(new Color(165, 177, 94, 205));
         g.fillRect(bounds.position.x, bounds.position.y, bounds.width, bounds.height);
         g.setColor(Color.BLACK);

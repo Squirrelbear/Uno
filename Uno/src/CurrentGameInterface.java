@@ -212,11 +212,6 @@ public class CurrentGameInterface extends WndInterface {
         overlayManager.paint(g);
 
         playDirectionAnimation.paint(g);
-
-        if(!isEnabled()) {
-            g.setColor(new Color(144, 143, 143, 204));
-            g.fillRect(bounds.position.x, bounds.position.y, bounds.width, bounds.height);
-        }
     }
 
     /**
