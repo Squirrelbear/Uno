@@ -50,6 +50,14 @@ public class Player {
      * When true the cards for this player are revealed face-up.
      */
     private boolean showCards;
+    /**
+     * The total score between multiple rounds for this player.
+     */
+    private int totalScore;
+    /**
+     * The score for a single round for this player.
+     */
+    private int currentRoundScore;
 
     /**
      * Initialises the player with an empty hand and defaults to showing cards if
@@ -307,5 +315,33 @@ public class Player {
             }
             remainingElements--;
         }
+    }
+
+    /**
+     * Sets the currentRoundScore and increases the totalScore by this amount.
+     *
+     * @param newCurrentRoundScore New score for this player.
+     */
+    public void setCurrentRoundScore(int newCurrentRoundScore) {
+        this.currentRoundScore = currentRoundScore;
+        totalScore += currentRoundScore;
+    }
+
+    /**
+     * The total score between multiple rounds.
+     *
+     * @return The current total score for this player.
+     */
+    public int getTotalScore() {
+        return totalScore;
+    }
+
+    /**
+     * Gets the current round score for this player.
+     *
+     * @return The current score for this player for the current round.
+     */
+    public int getCurrentRoundScore() {
+        return currentRoundScore;
     }
 }

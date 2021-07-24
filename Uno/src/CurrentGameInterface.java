@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -152,16 +153,14 @@ public class CurrentGameInterface extends WndInterface {
     private void checkForEndOfRound() {
         for(Player player : players) {
             if(player.getHand().size() == 0) {
-                // TODO Note need to hide all Overlays.
-                System.out.println(player.getPlayerName() + " won the game!");
                 int totalScore = 0;
                 for (int i = 0; i < players.size(); i++) {
                     if (players.get(i) != player) {
+                        players.get(i).setCurrentRoundScore(0);
                         totalScore += players.get(i).getHandTotalScore();
-                        System.out.println("Player " + i + ": " + players.get(i).getHandTotalScore());
                     }
                 }
-                System.out.println("Total score: " + totalScore);
+                player.setCurrentRoundScore(totalScore);
                 setEnabled(false);
                 return;
             }
@@ -251,6 +250,22 @@ public class CurrentGameInterface extends WndInterface {
 
         overlayManager.handleMouseMove(mousePosition);
         bottomPlayer.updateHover(mousePosition);
+    }
+
+    /**
+     * Handles the key events for this interface.
+     *
+     * @param keyCode The key that was pressed.
+     */
+    @Override
+    public void handleInput(int keyCode) {
+        if(keyCode == KeyEvent.VK_S) {
+            sortHand();
+        } else if(keyCode == KeyEvent.VK_R) {
+            revealHands();
+        } else if(keyCode == KeyEvent.VK_T) {
+            toggleTurnDirection();
+        }
     }
 
     /**

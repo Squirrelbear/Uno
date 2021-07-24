@@ -21,6 +21,8 @@ public abstract class WndInterface {
 
     /**
      * Initialise the interface with bounds and make it enabled.
+     *
+     * @param bounds Bounds of the interface.
      */
     public WndInterface(Rectangle bounds) {
         isEnabled = true;
@@ -74,4 +76,10 @@ public abstract class WndInterface {
         return isEnabled;
     }
 
+    /**
+     * Handles the key input from a keyboard action.
+     *
+     * @param keyCode The key that was pressed.
+     */
+    public void handleInput(int keyCode) {}
 }
