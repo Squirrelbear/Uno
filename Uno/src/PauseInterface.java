@@ -31,9 +31,11 @@ public class PauseInterface extends WndInterface {
         super(bounds);
         this.gamePanel = gamePanel;
         buttonList = new ArrayList<>();
-        buttonList.add(new Button(new Position(bounds.position.x+6, bounds.position.y+6),
+        buttonList.add(new Button(new Position(bounds.position.x+6, bounds.position.y+6+60),
                 bounds.width-12, 30, "Resume", 1));
-        buttonList.add(new Button(new Position(bounds.position.x+6, bounds.position.y+6+30+6),
+        buttonList.add(new Button(new Position(bounds.position.x+6, bounds.position.y+6+30+6+60),
+                        bounds.width-12, 30, "Return to Lobby", 3));
+        buttonList.add(new Button(new Position(bounds.position.x+6, bounds.position.y+6+(30+6)*2+60),
                 bounds.width-12, 30, "Quit", 2));
     }
 
@@ -58,6 +60,9 @@ public class PauseInterface extends WndInterface {
         g.fillRect(bounds.position.x, bounds.position.y, bounds.width, bounds.height);
         g.setColor(Color.BLACK);
         g.drawRect(bounds.position.x, bounds.position.y, bounds.width, bounds.height);
+        g.setFont(new Font("Arial", Font.BOLD, 40));
+        int strWidth = g.getFontMetrics().stringWidth("Paused");
+        g.drawString("Paused", bounds.position.x + bounds.width/2-strWidth/2, bounds.position.y+40);
         buttonList.forEach(button -> button.paint(g));
     }
 
@@ -102,6 +107,7 @@ public class PauseInterface extends WndInterface {
         switch(actionID) {
             case 1 -> gamePanel.setPauseState(false);
             case 2 -> gamePanel.quitGame();
+            case 3 -> gamePanel.showLobby();
         }
     }
 }

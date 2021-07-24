@@ -54,9 +54,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     /**
      * Sets the currently active interface to the lobby removing any existing interface.
+     * If this is triggered from the pause interface it just resumes the current interface.
      */
     public void showLobby() {
-        activeInterface = new LobbyInterface(new Rectangle(0,0,PANEL_WIDTH, PANEL_HEIGHT), this);
+        if(!(activeInterface instanceof LobbyInterface)) {
+            activeInterface = new LobbyInterface(new Rectangle(0, 0, PANEL_WIDTH, PANEL_HEIGHT), this);
+        }
+        setPauseState(false);
     }
 
     /**
