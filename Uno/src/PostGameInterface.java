@@ -7,18 +7,20 @@ public class PostGameInterface extends WndInterface {
      * List of buttons visible on the interface.
      */
     private final List<Button> buttonList;
-    private List<Player> players;
-    private RuleSet ruleSet;
+    private final List<Player> players;
+    private final RuleSet ruleSet;
+    private final GamePanel gamePanel;
 
     /**
      * Initialise the interface with bounds and make it enabled.
      *
      * @param bounds Bounds of the interface.
      */
-    public PostGameInterface(Rectangle bounds, List<Player> playerList, RuleSet ruleSet) {
+    public PostGameInterface(Rectangle bounds, List<Player> playerList, RuleSet ruleSet, GamePanel gamePanel) {
         super(bounds);
         this.players = playerList;
         this.ruleSet = ruleSet;
+        this.gamePanel = gamePanel;
 
         buttonList = new ArrayList<>();
     }

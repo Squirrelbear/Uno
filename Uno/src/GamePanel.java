@@ -52,18 +52,44 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         addMouseMotionListener(this);
     }
 
+    /**
+     * Sets the currently active interface to the lobby removing any existing interface.
+     */
     public void showLobby() {
         activeInterface = new LobbyInterface(new Rectangle(0,0,PANEL_WIDTH, PANEL_HEIGHT), this);
     }
 
     /**
-     * Creates a new game with the specified list of players and then disables the lobby.
+     * Sets the currently active interface to the post-game interface after a game has ended.
+     *
+     * @param playerList List of players who were playing in the round.
+     * @param ruleSet Rules applied during the round.
+     */
+    public void showPostGame(List<Player> playerList, RuleSet ruleSet) {
+        activeInterface = new PostGameInterface(new Rectangle(0,0,PANEL_WIDTH, PANEL_HEIGHT),
+                                                playerList, ruleSet, this);
+    }
+
+    /**
+     * Creates a new game with the specified list of players. Use this for coming from the lobby.
      *
      * @param playerList The player list to start a game with.
      * @param ruleSet Definition of how the game is to be played.
      */
     public void startGame(List<LobbyPlayer> playerList, RuleSet ruleSet) {
-        activeInterface = new CurrentGameInterface(new Rectangle(0,0,PANEL_WIDTH,PANEL_HEIGHT), ruleSet, playerList);
+        activeInterface = new CurrentGameInterface(new Rectangle(0,0,PANEL_WIDTH,PANEL_HEIGHT),
+                                                    ruleSet, playerList, this);
+    }
+
+    /**
+     * Creates a new game with the specified list of players. Use this for coming from post-game.
+     *
+     * @param playerList The player list to start a new round with.
+     * @param ruleSet Definition of how the game is to be played.
+     */
+    public void startNextRound(List<Player> playerList, RuleSet ruleSet) {
+        activeInterface = new CurrentGameInterface(new Rectangle(0,0,PANEL_WIDTH,PANEL_HEIGHT),
+                playerList, ruleSet, this);
     }
 
     /**

@@ -73,6 +73,10 @@ public class CurrentGameInterface extends WndInterface {
      * Reference to the current instance of this class so that other classes can quickly access it directly.
      */
     private static CurrentGameInterface activeSingleton;
+    /**
+     * Reference to GamePanel for when the game ends.
+     */
+    private GamePanel gamePanel;
 
     /**
      * Gets the current single instance of CurrentGameInterface. This is not enforced, but
@@ -92,8 +96,8 @@ public class CurrentGameInterface extends WndInterface {
      * @param ruleSet The rules definition for how the game is to be played.
      * @param lobbyPlayers Players to create in the game.
      */
-    public CurrentGameInterface(Rectangle bounds, RuleSet ruleSet, List<LobbyPlayer> lobbyPlayers) {
-        this(bounds, createPlayersFromLobby(lobbyPlayers, bounds), ruleSet);
+    public CurrentGameInterface(Rectangle bounds, RuleSet ruleSet, List<LobbyPlayer> lobbyPlayers, GamePanel gamePanel) {
+        this(bounds, createPlayersFromLobby(lobbyPlayers, bounds), ruleSet, gamePanel);
     }
 
     /**
@@ -104,10 +108,11 @@ public class CurrentGameInterface extends WndInterface {
      * @param playerList Players to create in the game.
      * @param ruleSet The rules definition for how the game is to be played.
      */
-    public CurrentGameInterface(Rectangle bounds, List<Player> playerList, RuleSet ruleSet) {
+    public CurrentGameInterface(Rectangle bounds, List<Player> playerList, RuleSet ruleSet, GamePanel gamePanel) {
         super(bounds);
         activeSingleton = this;
         this.ruleSet = ruleSet;
+        this.gamePanel = gamePanel;
         deck = new Deck(new Position(100,100));
         recentCards = new ArrayList<>();
         centredCardPos = new Position(bounds.position.x+bounds.width/2-30,bounds.position.y+bounds.height/2-45);
@@ -161,7 +166,7 @@ public class CurrentGameInterface extends WndInterface {
                     }
                 }
                 player.setCurrentRoundScore(totalScore);
-                setEnabled(false);
+                gamePanel.showPostGame(players, ruleSet);
                 return;
             }
         }
