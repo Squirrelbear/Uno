@@ -156,6 +156,28 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     /**
+     * Draws a title with UNO! and text below for credits.
+     *
+     * @param g Reference to the Graphics object for rendering.
+     * @param bounds Bounds of the game area.
+     */
+    public void paintUnoTitle(Graphics g, Rectangle bounds) {
+        g.setFont(new Font("Arial", Font.BOLD, 40));
+        g.drawString("UNO!", bounds.width/2-40, 50);
+        g.setFont(new Font("Arial", Font.BOLD, 10));
+        g.drawString("Developed by Peter Mitchell (2021)", bounds.width/2-70, 65);
+        g.setFont(new Font("Arial", Font.BOLD, 40));
+        g.setColor(Card.getColourByID(0));
+        g.drawString("U", bounds.width/2-40+2, 48);
+        g.setColor(Card.getColourByID(1));
+        g.drawString("N", bounds.width/2-40+2+30, 48);
+        g.setColor(Card.getColourByID(2));
+        g.drawString("O", bounds.width/2-40+2+60, 48);
+        g.setColor(Card.getColourByID(3));
+        g.drawString("!", bounds.width/2-40+2+90, 48);
+    }
+
+    /**
      * Passes the mouse event on to all the windows.
      *
      * @param e Information about the mouse event.

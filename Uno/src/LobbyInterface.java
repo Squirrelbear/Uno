@@ -120,6 +120,7 @@ public class LobbyInterface extends WndInterface {
     @Override
     public void paint(Graphics g) {
         drawBackground(g);
+        gamePanel.paintUnoTitle(g, bounds);
 
         // Draw interaction elements
         buttonList.forEach(button -> button.paint(g));
@@ -146,19 +147,6 @@ public class LobbyInterface extends WndInterface {
         g.setColor(Color.BLACK);
         g.drawRect(10, 80, bounds.width/2+20, 500);
         g.drawRect(bounds.width/2+40, 80, bounds.width/2-60, 500);
-        g.setFont(new Font("Arial", Font.BOLD, 40));
-        g.drawString("UNO!", bounds.width/2-40, 50);
-        g.setFont(new Font("Arial", Font.BOLD, 10));
-        g.drawString("Developed by Peter Mitchell (2021)", bounds.width/2-70, 65);
-        g.setFont(new Font("Arial", Font.BOLD, 40));
-        g.setColor(Card.getColourByID(0));
-        g.drawString("U", bounds.width/2-40+2, 48);
-        g.setColor(Card.getColourByID(1));
-        g.drawString("N", bounds.width/2-40+2+30, 48);
-        g.setColor(Card.getColourByID(2));
-        g.drawString("O", bounds.width/2-40+2+60, 48);
-        g.setColor(Card.getColourByID(3));
-        g.drawString("!", bounds.width/2-40+2+90, 48);
     }
 
     /**

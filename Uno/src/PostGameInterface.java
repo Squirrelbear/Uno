@@ -74,6 +74,7 @@ public class PostGameInterface extends WndInterface {
     @Override
     public void paint(Graphics g) {
         drawBackground(g);
+        gamePanel.paintUnoTitle(g, bounds);
         drawPlayers(g);
 
         buttonList.forEach(button -> button.paint(g));
@@ -95,19 +96,6 @@ public class PostGameInterface extends WndInterface {
         g.fillRect(bounds.width/4, 80, bounds.width/2, 500);
         g.setColor(Color.BLACK);
         g.drawRect(bounds.width/4, 80, bounds.width/2, 500);
-        g.setFont(new Font("Arial", Font.BOLD, 40));
-        g.drawString("UNO!", bounds.width/2-40, 50);
-        g.setFont(new Font("Arial", Font.BOLD, 10));
-        g.drawString("Developed by Peter Mitchell (2021)", bounds.width/2-70, 65);
-        g.setFont(new Font("Arial", Font.BOLD, 40));
-        g.setColor(Card.getColourByID(0));
-        g.drawString("U", bounds.width/2-40+2, 48);
-        g.setColor(Card.getColourByID(1));
-        g.drawString("N", bounds.width/2-40+2+30, 48);
-        g.setColor(Card.getColourByID(2));
-        g.drawString("O", bounds.width/2-40+2+60, 48);
-        g.setColor(Card.getColourByID(3));
-        g.drawString("!", bounds.width/2-40+2+90, 48);
     }
 
     private void drawPlayers(Graphics g) {
