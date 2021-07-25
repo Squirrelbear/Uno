@@ -114,6 +114,7 @@ public class AIPlayer extends Player {
             CurrentGameInterface.getCurrentGame().setCurrentTurnAction(TurnActionFactory.drawCardAsAction(getPlayerID()));
         } else {
             Card cardToPlay = chooseCard(validMoves);
+            checkCallUNO();
             CurrentGameInterface.getCurrentGame().setCurrentTurnAction(TurnActionFactory.playCardAsAction(
                     getPlayerID(), cardToPlay.getCardID(), cardToPlay.getFaceValueID(), cardToPlay.getColourID()));
         }
@@ -188,6 +189,7 @@ public class AIPlayer extends Player {
      * @param decisionAction Reference to the current action requiring a decision.
      */
     private void chooseKeepOrPlay(TurnActionFactory.TurnDecisionAction decisionAction) {
+        checkCallUNO();
         decisionAction.injectFlagProperty(1);
     }
 
@@ -220,6 +222,7 @@ public class AIPlayer extends Player {
         if(CurrentGameInterface.getCurrentGame().getRuleSet().canStackCards()) {
             Card validCard = getHand().stream().filter(card -> card.getFaceValueID() == 13).findFirst().orElse(null);
             if(validCard != null) {
+                checkCallUNO();
                 decisionAction.injectProperty("faceValueID", validCard.getFaceValueID());
                 decisionAction.injectProperty("colourID", validCard.getColourID());
                 decisionAction.injectProperty("cardID", validCard.getCardID());
@@ -230,6 +233,8 @@ public class AIPlayer extends Player {
         }
         decisionAction.injectProperty("isChaining", 0);
         // Randomly choose 50-50 whether to challenge or decline
+        // Don't need to check the no bluffing rule because this method is only called if a valid choice is available
+        // And the AI will ALWAYS choose to stack a card meaning this will never run the random chance of challenge in those cases.
         decisionAction.injectFlagProperty((int)(Math.random()*2));
     }
 
@@ -243,6 +248,7 @@ public class AIPlayer extends Player {
         if(CurrentGameInterface.getCurrentGame().getRuleSet().canStackCards()) {
             Card validCard = getHand().stream().filter(card -> card.getFaceValueID() == 10).findFirst().orElse(null);
             if(validCard != null) {
+                checkCallUNO();
                 decisionAction.injectProperty("faceValueID", validCard.getFaceValueID());
                 decisionAction.injectProperty("colourID", validCard.getColourID());
                 decisionAction.injectProperty("cardID", validCard.getCardID());
@@ -251,5 +257,17 @@ public class AIPlayer extends Player {
             }
         }
         decisionAction.injectFlagProperty(0);
+    }
+
+    /**
+     * Evaluates whether to call UNO to make the AI safe.
+     */
+    private void checkCallUNO() {
+        if(getHand().size() != 2) return;
+        if(Math.random() * 100 < 80) {
+            setUnoState(UNOState.Called);
+            // TODO signal overlay
+            System.out.println(getPlayerName() + " called UNO");
+        }
     }
 }

@@ -118,7 +118,6 @@ public class CurrentGameInterface extends WndInterface {
         deck = new Deck(new Position(centredCardPos.x-160,centredCardPos.y));
 
         this.players = playerList;
-        bottomPlayer = players.get(0);
         for (Player player : players) {
             if(player.getPlayerType() == Player.PlayerType.ThisPlayer) {
                 bottomPlayer = player;
@@ -225,9 +224,7 @@ public class CurrentGameInterface extends WndInterface {
     public void handleMousePress(Position mousePosition, boolean isLeft) {
         if(!isEnabled()) return;
 
-        if(overlayManager.isEnabled()) {
-            overlayManager.handleMousePress(mousePosition, isLeft);
-        }
+        overlayManager.handleMousePress(mousePosition, isLeft);
 
         if(currentTurnAction == null && currentPlayerID == bottomPlayer.getPlayerID()) {
             if (deck.isPositionInside(mousePosition)) {
@@ -327,6 +324,7 @@ public class CurrentGameInterface extends WndInterface {
      * Moves to the next player depending on whether the direction is clockwise or anti-clockwise.
      */
     public void moveToNextPlayer() {
+        updateUNOState();
         if(isIncreasing) {
             currentPlayerID++;
             if (currentPlayerID >= players.size()) {
@@ -336,6 +334,18 @@ public class CurrentGameInterface extends WndInterface {
             currentPlayerID--;
             if(currentPlayerID < 0) {
                 currentPlayerID = players.size()-1;
+            }
+        }
+    }
+
+    /**
+     * Sets the current player to NotSafe if they have one card or Safe otherwise, all other players are set to Safe.
+     */
+    private void updateUNOState() {
+        players.get(currentPlayerID).setUnoState(players.get(currentPlayerID).getHand().size() == 1 ? Player.UNOState.NotSafe : Player.UNOState.Safe);
+        for(Player player : players) {
+            if(player.getPlayerID() != currentPlayerID) {
+                player.setUnoState(Player.UNOState.Safe);
             }
         }
     }

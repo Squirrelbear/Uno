@@ -48,8 +48,8 @@ public class OverlayManager extends WndInterface {
 
         UnoButton unoButton = new UnoButton(new Position(bounds.position.x + bounds.width - UnoButton.WIDTH-40,
                 bounds.position.y + bounds.height - UnoButton.HEIGHT-40));
-        AntiUnoButton antiUnoButton = new AntiUnoButton(new Rectangle(new Position(bounds.position.x + bounds.width - UnoButton.WIDTH-40,
-                bounds.position.y + bounds.height - UnoButton.HEIGHT-40),40,20));
+        AntiUnoButton antiUnoButton = new AntiUnoButton(new Position(bounds.position.x + bounds.width - UnoButton.WIDTH-40-100,
+                bounds.position.y + bounds.height - UnoButton.HEIGHT-40));
         for(int i = 0; i < playerList.size(); i++) {
             SkipVisualOverlay skipVisualOverlay = new SkipVisualOverlay(playerList.get(i).getCentreOfBounds());
             overlays.put("SkipVisual"+i,skipVisualOverlay);

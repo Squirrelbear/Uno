@@ -10,32 +10,24 @@ import java.awt.*;
  * @author Peter Mitchell
  * @version 2021.1
  */
-public class AntiUnoButton extends WndInterface implements GeneralOverlayInterface {
+public class AntiUnoButton extends UnoButton implements GeneralOverlayInterface {
     /**
-     * Initialise the interface with bounds.
+     * Initialises the AntiUnoButton.
      *
-     * @param bounds Bounds of the button.
+     * @param position Position to place the Uno button.
      */
-    public AntiUnoButton(Rectangle bounds) {
-        super(bounds);
+    public AntiUnoButton(Position position) {
+        super(position);
     }
 
-    /**
-     * Shows the overlay.
-     */
-    @Override
-    public void showOverlay() {
-        setEnabled(true);
-    }
-
-    /**
-     * Does nothing.
-     *
-     * @param deltaTime Time since last update.
-     */
     @Override
     public void update(int deltaTime) {
-
+        isActive = false;
+        for(Player player : CurrentGameInterface.getCurrentGame().getAllPlayers()) {
+            if(player != bottomPlayer && !player.isSafe() && player.getHand().size() == 1) {
+                isActive = true;
+            }
+        }
     }
 
     /**
@@ -45,6 +37,25 @@ public class AntiUnoButton extends WndInterface implements GeneralOverlayInterfa
      */
     @Override
     public void paint(Graphics g) {
-        // TODO
+        if(!isActive) return;
+
+        drawButtonBackground(g);
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.BOLD, 50));
+        int strWidth = g.getFontMetrics().stringWidth("!");
+        g.drawString("!", bounds.position.x+bounds.width/2-strWidth/2-2, bounds.position.y+bounds.height/2+2+10+10);
+        g.setColor(new Color(226, 173, 67));
+        g.drawString("!", bounds.position.x+bounds.width/2-strWidth/2, bounds.position.y+bounds.height/2+10+10);
+    }
+
+    @Override
+    public void handleMousePress(Position mousePosition, boolean isLeft) {
+        if(isActive && bounds.isPositionInside(mousePosition)) {
+            for(Player player : CurrentGameInterface.getCurrentGame().getAllPlayers()) {
+                if(player != bottomPlayer && !player.isSafe() && player.getHand().size() == 1) {
+                    System.out.println("Calling out Player " + player.getPlayerName());
+                }
+            }
+        }
     }
 }

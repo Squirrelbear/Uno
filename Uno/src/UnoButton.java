@@ -23,6 +23,14 @@ public class UnoButton extends WndInterface implements GeneralOverlayInterface {
      * Current hover status of the button.
      */
     private boolean isHovered;
+    /**
+     * Reference to the BottomPlayer.
+     */
+    protected Player bottomPlayer;
+    /**
+     * When isActive is active the button can be interacted with and is visible.
+     */
+    protected boolean isActive;
 
     /**
      * Initialises the UnoButton.
@@ -33,6 +41,8 @@ public class UnoButton extends WndInterface implements GeneralOverlayInterface {
         super(new Rectangle(position, WIDTH, HEIGHT));
         isHovered = false;
         setEnabled(true);
+        bottomPlayer = CurrentGameInterface.getCurrentGame().getBottomPlayer();
+        isActive = false;
     }
 
     /**
@@ -44,13 +54,16 @@ public class UnoButton extends WndInterface implements GeneralOverlayInterface {
     }
 
     /**
-     * Does nothing.
+     * Enables the button when it should be available.
      *
      * @param deltaTime Time since last update.
      */
     @Override
     public void update(int deltaTime) {
-
+        isActive = bottomPlayer.getUnoState() == Player.UNOState.NotSafe
+                || (bottomPlayer.getUnoState() == Player.UNOState.Safe
+                        && CurrentGameInterface.getCurrentGame().getCurrentPlayer() == bottomPlayer
+                        && bottomPlayer.getHand().size() == 2);
     }
 
     /**
@@ -60,18 +73,22 @@ public class UnoButton extends WndInterface implements GeneralOverlayInterface {
      */
     @Override
     public void paint(Graphics g) {
-        if(!isEnabled()) return;
+        if(!isActive) return;
 
-        g.setColor(new Color(147, 44, 44));
-        int expandAmount = isHovered ? 20 : 0;
-        g.fillOval(bounds.position.x-expandAmount/2, bounds.position.y-expandAmount/2,
-                bounds.width+expandAmount,bounds.height+expandAmount);
+        drawButtonBackground(g);
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 30));
         int strWidth = g.getFontMetrics().stringWidth("UNO");
         g.drawString("UNO", bounds.position.x+bounds.width/2-strWidth/2-2, bounds.position.y+bounds.height/2+2+10);
         g.setColor(new Color(226, 173, 67));
         g.drawString("UNO", bounds.position.x+bounds.width/2-strWidth/2, bounds.position.y+bounds.height/2+10);
+    }
+
+    protected void drawButtonBackground(Graphics g) {
+        g.setColor(new Color(147, 44, 44));
+        int expandAmount = isHovered ? 20 : 0;
+        g.fillOval(bounds.position.x-expandAmount/2, bounds.position.y-expandAmount/2,
+                bounds.width+expandAmount,bounds.height+expandAmount);
     }
 
     /**
@@ -82,5 +99,13 @@ public class UnoButton extends WndInterface implements GeneralOverlayInterface {
     @Override
     public void handleMouseMove(Position mousePosition) {
         isHovered = bounds.isPositionInside(mousePosition);
+    }
+
+    @Override
+    public void handleMousePress(Position mousePosition, boolean isLeft) {
+        if(isActive && bounds.isPositionInside(mousePosition)) {
+            // TODO show call
+            bottomPlayer.setUnoState(Player.UNOState.Called);
+        }
     }
 }

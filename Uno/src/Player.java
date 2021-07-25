@@ -22,6 +22,13 @@ public class Player {
     public enum PlayerType { ThisPlayer, AIPlayer, NetworkPlayer}
 
     /**
+     * Safe indicates the player is not vulnerable to counter calls.
+     * Called indicates the Player called before ending their turn with a card.
+     * NotSafe indicates that players can counter call the player's uno and make them draw cards.
+     */
+    public enum UNOState { Safe, Called, NotSafe }
+
+    /**
      * The unique ID for this player.
      */
     private final int playerID;
@@ -67,6 +74,10 @@ public class Player {
      * When true, the player's name is centred to the left side of the bounds, otherwise it is centred on the top.
      */
     private final boolean showPlayerNameLeft;
+    /**
+     * The current UNOState that can be Safe, Called, or NotSafe.
+     */
+    private UNOState unoState;
 
     /**
      * Initialises the player with an empty hand and defaults to showing cards if
@@ -88,6 +99,7 @@ public class Player {
         showCards = playerType == PlayerType.ThisPlayer;
         wonRound = false;
         totalScore = currentRoundScore = 0;
+        unoState = UNOState.Safe;
     }
 
     /**
@@ -383,5 +395,39 @@ public class Player {
         totalScore = 0;
         currentRoundScore = 0;
         wonRound = false;
+        unoState = UNOState.Safe;
+    }
+
+    /**
+     * Can transition from Safe->Called (NotSafe->Called should not occur).
+     * Can transition from Safe->NotSafe, NotSafe->Safe, and Called->Safe.
+     * Will ignore attempt to transition from Called->NotSafe. This behaviour
+     * handles the ignoring of a transition to NotSafe when the turn ends.
+     *
+     * @param unoState The new state to set.
+     */
+    public void setUnoState(UNOState unoState) {
+        if(this.unoState == UNOState.Called && unoState == UNOState.NotSafe) {
+            return;
+        }
+        this.unoState = unoState;
+    }
+
+    /**
+     * Checks the current unoState for this player to verify if they are safe from being called.
+     *
+     * @return True if the UNOState is Safe or Called, and false if UNOState is
+     */
+    public boolean isSafe() {
+        return unoState != UNOState.NotSafe;
+    }
+
+    /**
+     * Gets the current UNOState that can be Safe, Called, or NotSafe.
+     *
+     * @return The current UNOState.
+     */
+    public UNOState getUnoState() {
+        return unoState;
     }
 }
