@@ -240,7 +240,9 @@ public class CurrentGameInterface extends WndInterface {
         } else if(currentTurnAction == null && currentPlayerID != bottomPlayer.getPlayerID() &&
                     CurrentGameInterface.getCurrentGame().getRuleSet().allowJumpInRule()) {
             Card cardToPlay = bottomPlayer.chooseCardFromClick(mousePosition);
-            jumpIn(bottomPlayer.getPlayerID(), cardToPlay);
+            if(cardToPlay != null) {
+                jumpIn(bottomPlayer.getPlayerID(), cardToPlay);
+            }
         }
     }
 
