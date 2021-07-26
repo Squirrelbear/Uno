@@ -51,14 +51,19 @@ public class OverlayManager extends WndInterface {
         AntiUnoButton antiUnoButton = new AntiUnoButton(new Position(bounds.position.x + bounds.width - UnoButton.WIDTH-40-100,
                 bounds.position.y + bounds.height - UnoButton.HEIGHT-40));
         for(int i = 0; i < playerList.size(); i++) {
-            SkipVisualOverlay skipVisualOverlay = new SkipVisualOverlay(playerList.get(i).getCentreOfBounds());
+            Position playerCentre = playerList.get(i).getCentreOfBounds();
+            SkipVisualOverlay skipVisualOverlay = new SkipVisualOverlay(playerCentre);
             overlays.put("SkipVisual"+i,skipVisualOverlay);
-            DrawNMessageOverlay drawNMessageOverlay = new DrawNMessageOverlay(playerList.get(i).getCentreOfBounds());
+            DrawNMessageOverlay drawNMessageOverlay = new DrawNMessageOverlay(playerCentre);
             overlays.put("DrawN"+i,drawNMessageOverlay);
-            ChallengeSuccessOverlay challengeSuccessOverlay = new ChallengeSuccessOverlay(new Rectangle(playerList.get(i).getCentreOfBounds(), 100,100));
+            ChallengeSuccessOverlay challengeSuccessOverlay = new ChallengeSuccessOverlay(new Rectangle(playerCentre, 100,100));
             overlays.put("ChallengeSuccess"+i,challengeSuccessOverlay);
-            ChallengeFailedOverlay challengeFailedOverlay = new ChallengeFailedOverlay(new Rectangle(playerList.get(i).getCentreOfBounds(), 100,100));
+            ChallengeFailedOverlay challengeFailedOverlay = new ChallengeFailedOverlay(new Rectangle(playerCentre, 100,100));
             overlays.put("ChallengeFailed"+i,challengeFailedOverlay);
+            UNOCalledOverlay unoCalledOverlay = new UNOCalledOverlay(new Position(playerCentre.x,playerCentre.y+20));
+            overlays.put("UNOCalled"+i,unoCalledOverlay);
+            AntiUnoOverlay antiUnoOverlay = new AntiUnoOverlay(new Position(playerCentre.x,playerCentre.y+20));
+            overlays.put("AntiUnoCalled"+i,antiUnoOverlay);
         }
         overlays.put("UnoButton", unoButton);
         overlays.put("antiUnoButton", antiUnoButton);

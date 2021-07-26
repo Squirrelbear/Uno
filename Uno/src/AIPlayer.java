@@ -31,6 +31,14 @@ public class AIPlayer extends Player {
      * Timer used for delaying between actions.
      */
     private double delayTimer;
+    /**
+     * ID of the player being considered for calling out.
+     */
+    private int consideringPlayerID;
+    /**
+     * Delay till a decision is made.
+     */
+    private double consideringDelayTimer;
 
     /**
      * Defines an AI on top of a basic player ready to perform actions
@@ -50,6 +58,7 @@ public class AIPlayer extends Player {
             this.strategy = strategy;
         }
         resetDelayTimer();
+        consideringDelayTimer = -1;
     }
 
     /**
@@ -71,8 +80,7 @@ public class AIPlayer extends Player {
      */
     @Override
     public void update(int deltaTime) {
-
-        // TODO Need to add Calling of Uno and AntiUno
+        updateAntiUnoCheck(deltaTime);
 
         // Do nothing more if this is not the current player.
         if(CurrentGameInterface.getCurrentGame().getCurrentPlayer().getPlayerID() != getPlayerID()) {
@@ -97,6 +105,33 @@ public class AIPlayer extends Player {
                 TurnActionFactory.TurnDecisionAction decisionAction = (TurnActionFactory.TurnDecisionAction) currentAction;
                 if(decisionAction.timeOut) {
                     handleTurnDecision(decisionAction);
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks the current status of any available anti-uno calls and makes a decision whether to call them out.
+     *
+     * @param deltaTime Time since last update.
+     */
+    private void updateAntiUnoCheck(int deltaTime) {
+        for(Player player : CurrentGameInterface.getCurrentGame().getAllPlayers()) {
+            if(player != this && !player.isSafe() && player.getHand().size() == 1) {
+                if(consideringPlayerID != player.getPlayerID()) {
+                    consideringDelayTimer = Math.random() * 800 + 200;
+                }
+                consideringPlayerID = player.getPlayerID();
+            }
+        }
+        if(consideringPlayerID == -1 || CurrentGameInterface.getCurrentGame().getPlayerByID(consideringPlayerID).isSafe()) {
+            consideringPlayerID = -1;
+        } else {
+            consideringDelayTimer -= deltaTime;
+            if(consideringDelayTimer <= 0) {
+                consideringDelayTimer = Math.random() * 1200 + 300;
+                if(Math.random() * 100 < 30) {
+                    CurrentGameInterface.getCurrentGame().applyAntiUno(consideringPlayerID);
                 }
             }
         }
@@ -264,10 +299,9 @@ public class AIPlayer extends Player {
      */
     private void checkCallUNO() {
         if(getHand().size() != 2) return;
-        if(Math.random() * 100 < 80) {
+        if(Math.random() * 100 < 70) {
             setUnoState(UNOState.Called);
-            // TODO signal overlay
-            System.out.println(getPlayerName() + " called UNO");
+            CurrentGameInterface.getCurrentGame().showGeneralOverlay("UNOCalled"+getPlayerID());
         }
     }
 }

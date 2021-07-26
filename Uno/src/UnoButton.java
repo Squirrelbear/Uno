@@ -101,11 +101,17 @@ public class UnoButton extends WndInterface implements GeneralOverlayInterface {
         isHovered = bounds.isPositionInside(mousePosition);
     }
 
+    /**
+     * When the button is available and is clicked the player is flagged as having called and the called signal is flashed.
+     *
+     * @param mousePosition Position of the mouse cursor during the press.
+     * @param isLeft        If true, the mouse button is left, otherwise is right.
+     */
     @Override
     public void handleMousePress(Position mousePosition, boolean isLeft) {
         if(isActive && bounds.isPositionInside(mousePosition)) {
-            // TODO show call
             bottomPlayer.setUnoState(Player.UNOState.Called);
+            CurrentGameInterface.getCurrentGame().showGeneralOverlay("UNOCalled"+bottomPlayer.getPlayerID());
         }
     }
 }

@@ -267,6 +267,8 @@ public class CurrentGameInterface extends WndInterface {
             toggleTurnDirection();
         } else if(keyCode == KeyEvent.VK_E) {
             bottomPlayer.emptyHand();
+        } else if(keyCode == KeyEvent.VK_P) {
+            bottomPlayer.removeCard(bottomPlayer.getHand().get(0));
         }
     }
 
@@ -348,6 +350,18 @@ public class CurrentGameInterface extends WndInterface {
                 player.setUnoState(Player.UNOState.Safe);
             }
         }
+    }
+
+    /**
+     * Applies the effect from being called out on not having said UNO.
+     * Flashes the message and draws two cards to that player.
+     */
+    public void applyAntiUno(int playerID) {
+        CurrentGameInterface.getCurrentGame().showGeneralOverlay("AntiUnoCalled"+playerID);
+        // Set to safe to prevent multiple anti-uno callouts.
+        players.get(playerID).setUnoState(Player.UNOState.Safe);
+        players.get(playerID).addCardToHand(deck.drawCard());
+        players.get(playerID).addCardToHand(deck.drawCard());
     }
 
     /**
