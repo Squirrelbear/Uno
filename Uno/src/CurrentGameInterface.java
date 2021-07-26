@@ -128,9 +128,10 @@ public class CurrentGameInterface extends WndInterface {
                 player.addCardToHand(deck.drawCard());
             }
         }
-        currentPlayerID = bottomPlayer.getPlayerID(); //(int) (Math.random()*players.size()); // TODO
-        isIncreasing = true;
+        currentPlayerID = (int) (Math.random()*players.size());
+        isIncreasing = (Math.random() * 100 < 50);
         playDirectionAnimation = new PlayDirectionAnimation(new Position(bounds.width/2,bounds.height/2), 120, 5);
+        playDirectionAnimation.setIsIncreasing(isIncreasing);
 
         overlayManager = new OverlayManager(bounds, players);
         forcePlayCard(deck.drawCard());
