@@ -52,9 +52,9 @@ public class OverlayManager extends WndInterface {
                 bounds.position.y + bounds.height - UnoButton.HEIGHT-40));
         for(int i = 0; i < playerList.size(); i++) {
             Position playerCentre = playerList.get(i).getCentreOfBounds();
-            SkipVisualOverlay skipVisualOverlay = new SkipVisualOverlay(playerCentre);
+            PlayerFlashOverlay skipVisualOverlay = new PlayerFlashOverlay(playerCentre, "SKIPPED", Color.RED, 40);
             overlays.put("SkipVisual"+i,skipVisualOverlay);
-            DrawNMessageOverlay drawNMessageOverlay = new DrawNMessageOverlay(playerCentre);
+            PlayerFlashOverlay drawNMessageOverlay = new PlayerFlashOverlay(playerCentre, "", Color.RED, 40);
             overlays.put("DrawN"+i,drawNMessageOverlay);
             ChallengeSuccessOverlay challengeSuccessOverlay = new ChallengeSuccessOverlay(new Rectangle(playerCentre, 100,100));
             overlays.put("ChallengeSuccess"+i,challengeSuccessOverlay);
@@ -62,9 +62,11 @@ public class OverlayManager extends WndInterface {
             overlays.put("ChallengeFailed"+i,challengeFailedOverlay);
             UNOCalledOverlay unoCalledOverlay = new UNOCalledOverlay(new Position(playerCentre.x,playerCentre.y+20));
             overlays.put("UNOCalled"+i,unoCalledOverlay);
-            AntiUnoOverlay antiUnoOverlay = new AntiUnoOverlay(new Position(playerCentre.x,playerCentre.y+20));
+            PlayerFlashOverlay antiUnoOverlay = new PlayerFlashOverlay(new Position(playerCentre.x,playerCentre.y+20),
+                    "!", new Color(226, 173, 67), 50);
             overlays.put("AntiUnoCalled"+i,antiUnoOverlay);
-            JumpInOverlay jumpInOverlay = new JumpInOverlay(new Position(playerCentre.x,playerCentre.y+20));
+            PlayerFlashOverlay jumpInOverlay = new PlayerFlashOverlay(new Position(playerCentre.x,playerCentre.y+20),
+                    "JUMPED IN", Color.ORANGE, 40);
             overlays.put("JumpIn"+i, jumpInOverlay);
         }
         overlays.put("UnoButton", unoButton);
@@ -103,9 +105,9 @@ public class OverlayManager extends WndInterface {
         WndInterface overlayToShow = overlays.get(splitOverlayName[0]);
         if(overlayToShow instanceof GeneralOverlayInterface) {
             ((GeneralOverlayInterface)overlayToShow).showOverlay();
-            if(overlayToShow instanceof DrawNMessageOverlay) {
+            if(splitOverlayName[0].startsWith("DrawN")) {
                 // Sets the number to be displayed.
-                ((DrawNMessageOverlay)overlayToShow).setN(Integer.parseInt(splitOverlayName[1]));
+                ((PlayerFlashOverlay)overlayToShow).setMessage("+"+splitOverlayName[1]);
             }
         }
     }

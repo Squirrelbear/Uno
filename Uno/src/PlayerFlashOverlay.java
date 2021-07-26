@@ -1,34 +1,46 @@
 import java.awt.*;
 
-/**
- * Uno
- *
- * DrawNMessageOverlay class:
- * Displays a short time flashing "+N" to show the number of cards a player drew.
- *
- * @author Peter Mitchell
- * @version 2021.1
- */
-public class DrawNMessageOverlay extends WndInterface implements GeneralOverlayInterface {
+public class PlayerFlashOverlay extends WndInterface implements GeneralOverlayInterface {
 
     /**
      * Timer till the overlay is hidden again.
      */
-    private double displayTimer;
-
+    protected double displayTimer;
     /**
-     * The message to display.
+     * Message to display.
      */
-    private String message;
+    protected String message;
+    /**
+     * Colour to show it with.
+     */
+    private final Color colour;
+    /**
+     * Size of the message.
+     */
+    protected final int fontSize;
 
     /**
      * Sets up the overlay ready to show.
      *
      * @param position Position where to place this overlay.
+     * @param message Message to display.
+     * @param colour Colour to show message with.
      */
-    public DrawNMessageOverlay(Position position) {
+    public PlayerFlashOverlay(Position position, String message, Color colour, int fontSize) {
         super(new Rectangle(position, 40,40));
         setEnabled(false);
+        this.message = message;
+        this.colour = colour;
+        this.fontSize = fontSize;
+    }
+
+    /**
+     * Sets the message to the new value.
+     *
+     * @param message The message to display.
+     */
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     /**
@@ -38,15 +50,6 @@ public class DrawNMessageOverlay extends WndInterface implements GeneralOverlayI
     public void showOverlay() {
         setEnabled(true);
         displayTimer = 2000;
-    }
-
-    /**
-     * Sets the message to be displayed to "+N".
-     *
-     * @param N The number to display.
-     */
-    public void setN(int N) {
-        message = "+" + N;
     }
 
     /**
@@ -63,7 +66,7 @@ public class DrawNMessageOverlay extends WndInterface implements GeneralOverlayI
     }
 
     /**
-     * Draws the +N text flashing with showing 75% of the time.
+     * Draws the SKIPPED text flashing with showing 75% of the time.
      *
      * @param g Reference to the Graphics object for rendering.
      */
@@ -71,10 +74,10 @@ public class DrawNMessageOverlay extends WndInterface implements GeneralOverlayI
     public void paint(Graphics g) {
         if(displayTimer % 200 < 150) {
             g.setColor(Color.BLACK);
-            g.setFont(new Font("Arial", Font.BOLD, 40));
+            g.setFont(new Font("Arial", Font.BOLD, fontSize));
             int strWidth = g.getFontMetrics().stringWidth(message);
             g.drawString(message, bounds.position.x - strWidth / 2 - 2, bounds.position.y - 2);
-            g.setColor(Color.RED);
+            g.setColor(colour);
             g.drawString(message, bounds.position.x - strWidth / 2, bounds.position.y);
         }
     }
