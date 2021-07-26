@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Uno:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Uno_jar</output-path>
+    <root id="archive" name="Uno.jar">
+      <element id="module-output" name="Uno" />
+      <element id="file-copy" path="$PROJECT_DIR$/AINameList.txt" />
+    </root>
+  </artifact>
+</component>
