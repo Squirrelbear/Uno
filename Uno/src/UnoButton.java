@@ -26,7 +26,7 @@ public class UnoButton extends WndInterface implements GeneralOverlayInterface {
     /**
      * Reference to the BottomPlayer.
      */
-    protected Player bottomPlayer;
+    protected final Player bottomPlayer;
     /**
      * When isActive is active the button can be interacted with and is visible.
      */

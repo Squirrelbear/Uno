@@ -307,7 +307,7 @@ public class LobbyInterface extends WndInterface {
      * Updates the text for the jump in rule.
      */
     private void updateJumpInRuleLabel() {
-        jumpInRuleStr = "Jump In: " + (ruleSet.allowJumpInRule() ? "On" : "Off") + "(Not Imp)";
+        jumpInRuleStr = "Jump In: " + (ruleSet.allowJumpInRule() ? "On" : "Off");
     }
 
     /**

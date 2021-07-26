@@ -237,6 +237,10 @@ public class CurrentGameInterface extends WndInterface {
                     currentTurnAction = TurnActionFactory.playCardAsAction(currentPlayerID, cardToPlay.getCardID(), cardToPlay.getFaceValueID(), cardToPlay.getColourID());
                 }
             }
+        } else if(currentTurnAction == null && currentPlayerID != bottomPlayer.getPlayerID() &&
+                    CurrentGameInterface.getCurrentGame().getRuleSet().allowJumpInRule()) {
+            Card cardToPlay = bottomPlayer.chooseCardFromClick(mousePosition);
+            jumpIn(bottomPlayer.getPlayerID(), cardToPlay);
         }
     }
 
@@ -270,6 +274,25 @@ public class CurrentGameInterface extends WndInterface {
             bottomPlayer.emptyHand();
         } else if(keyCode == KeyEvent.VK_P) {
             bottomPlayer.removeCard(bottomPlayer.getHand().get(0));
+        }
+    }
+
+    /**
+     * Verifies the card can be played as a jump in and then swaps the current player,
+     * and initiates the action of the card being played.
+     *
+     * @param playerID The player trying to jump in.
+     * @param cardToPlay The card that is being jumped in with.
+     */
+    public void jumpIn(int playerID, Card cardToPlay) {
+        Card topCard = getTopCard();
+        if(currentTurnAction == null && currentPlayerID != playerID
+                && topCard.getFaceValueID() == cardToPlay.getFaceValueID()
+                && topCard.getColourID() == cardToPlay.getColourID()) {
+            currentPlayerID = playerID;
+            showGeneralOverlay("JumpIn"+playerID);
+            currentTurnAction = TurnActionFactory.playCardAsAction(currentPlayerID, cardToPlay.getCardID(),
+                    cardToPlay.getFaceValueID(), cardToPlay.getColourID());
         }
     }
 

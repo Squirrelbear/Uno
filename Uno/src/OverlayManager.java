@@ -64,6 +64,8 @@ public class OverlayManager extends WndInterface {
             overlays.put("UNOCalled"+i,unoCalledOverlay);
             AntiUnoOverlay antiUnoOverlay = new AntiUnoOverlay(new Position(playerCentre.x,playerCentre.y+20));
             overlays.put("AntiUnoCalled"+i,antiUnoOverlay);
+            JumpInOverlay jumpInOverlay = new JumpInOverlay(new Position(playerCentre.x,playerCentre.y+20));
+            overlays.put("JumpIn"+i, jumpInOverlay);
         }
         overlays.put("UnoButton", unoButton);
         overlays.put("antiUnoButton", antiUnoButton);

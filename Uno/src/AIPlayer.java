@@ -36,9 +36,22 @@ public class AIPlayer extends Player {
      */
     private int consideringPlayerID;
     /**
-     * Delay till a decision is made.
+     * Delay till a decision is made about calling out.
      */
     private double consideringDelayTimer;
+    /**
+     * When true the current situation allows for a jump in.
+     * The transition from false to true is used to evaluate considerJumpIn.
+     */
+    private boolean canJumpIn;
+    /**
+     * When true the AIPlayer has chosen to jump in after the period consideringJumpInTimer.
+     */
+    private boolean consideringJumpIn;
+    /**
+     * Timer till a jump in is executed if still allowed.
+     */
+    private double consideringJumpInTimer;
 
     /**
      * Defines an AI on top of a basic player ready to perform actions
@@ -81,6 +94,7 @@ public class AIPlayer extends Player {
     @Override
     public void update(int deltaTime) {
         updateAntiUnoCheck(deltaTime);
+        updateJumpInCheck(deltaTime);
 
         // Do nothing more if this is not the current player.
         if(CurrentGameInterface.getCurrentGame().getCurrentPlayer().getPlayerID() != getPlayerID()) {
@@ -132,6 +146,50 @@ public class AIPlayer extends Player {
                 consideringDelayTimer = Math.random() * 1200 + 300;
                 if(Math.random() * 100 < 30) {
                     CurrentGameInterface.getCurrentGame().applyAntiUno(consideringPlayerID);
+                }
+            }
+        }
+    }
+
+    /**
+     * Updates the state of jumping in if it is allowed and possible for this player.
+     *
+     * @param deltaTime Time since last update.
+     */
+    private void updateJumpInCheck(int deltaTime) {
+        if(CurrentGameInterface.getCurrentGame().getRuleSet().allowJumpInRule()
+                && CurrentGameInterface.getCurrentGame().getCurrentTurnAction() == null
+                && CurrentGameInterface.getCurrentGame().getCurrentPlayer() != this) {
+            Card topCard = CurrentGameInterface.getCurrentGame().getTopCard();
+            List<Card> validCards = getHand().stream()
+                    .filter(card -> card.getFaceValueID() == topCard.getFaceValueID()
+                                    && card.getColourID() == topCard.getColourID())
+                    .collect(Collectors.toList());
+            if(!validCards.isEmpty()) {
+                if(!canJumpIn) {
+                    consideringJumpIn = Math.random() * 100 < 80;
+                    consideringDelayTimer = Math.random() * 200 + 100;
+                }
+                canJumpIn = true;
+            } else {
+                canJumpIn = false;
+                consideringJumpIn = false;
+            }
+        } else {
+            canJumpIn = false;
+            consideringJumpIn = false;
+        }
+
+        if(consideringJumpIn) {
+            consideringDelayTimer -= deltaTime;
+            if(consideringDelayTimer <= 0) {
+                Card topCard = CurrentGameInterface.getCurrentGame().getTopCard();
+                List<Card> validCards = getHand().stream()
+                        .filter(card -> card.getFaceValueID() == topCard.getFaceValueID()
+                                && card.getColourID() == topCard.getColourID())
+                        .collect(Collectors.toList());
+                if(!validCards.isEmpty()) {
+                    CurrentGameInterface.getCurrentGame().jumpIn(getPlayerID(), validCards.get(0));
                 }
             }
         }
