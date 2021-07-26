@@ -168,7 +168,7 @@ public class AIPlayer extends Player {
             if(!validCards.isEmpty()) {
                 if(!canJumpIn) {
                     consideringJumpIn = Math.random() * 100 < 80;
-                    consideringDelayTimer = Math.random() * 200 + 100;
+                    consideringJumpInTimer = Math.random() * 200 + 100;
                 }
                 canJumpIn = true;
             } else {
@@ -181,8 +181,8 @@ public class AIPlayer extends Player {
         }
 
         if(consideringJumpIn) {
-            consideringDelayTimer -= deltaTime;
-            if(consideringDelayTimer <= 0) {
+            consideringJumpInTimer -= deltaTime;
+            if(consideringJumpInTimer <= 0) {
                 Card topCard = CurrentGameInterface.getCurrentGame().getTopCard();
                 List<Card> validCards = getHand().stream()
                         .filter(card -> card.getFaceValueID() == topCard.getFaceValueID()
