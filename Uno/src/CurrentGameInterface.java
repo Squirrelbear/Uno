@@ -77,6 +77,14 @@ public class CurrentGameInterface extends WndInterface {
      * Reference to GamePanel for when the game ends.
      */
     private final GamePanel gamePanel;
+    /**
+     * When GamePanel.DEBUG_MODE and this are true, output is shown for each transition in the TaskAction sequence.
+     */
+    private boolean debugShowTaskActionNotes;
+    /**
+     * When GamePanel.DEBUG_MODE and this are true, output is shown with the whole tree TaskAction sequence when setCurrentTurnAction is used.
+     */
+    private boolean debugShowTreeOnNewAction;
 
     /**
      * Gets the current single instance of CurrentGameInterface. This is not enforced, but
@@ -136,6 +144,8 @@ public class CurrentGameInterface extends WndInterface {
         overlayManager = new OverlayManager(bounds, players);
         forcePlayCard(deck.drawCard());
         currentTurnAction = null;
+        debugShowTaskActionNotes = false;
+        debugShowTreeOnNewAction = false;
     }
 
     /**
@@ -181,13 +191,15 @@ public class CurrentGameInterface extends WndInterface {
     private void updateTurnAction() {
         if(currentTurnAction != null) {
             // Tree Debug Output
-            /*if (currentTurnAction instanceof TurnActionFactory.TurnDecisionAction) {
-                if (!((TurnActionFactory.TurnDecisionAction) currentTurnAction).hasRunOnce) {
+            if(GamePanel.DEBUG_MODE && debugShowTaskActionNotes) {
+                if (currentTurnAction instanceof TurnActionFactory.TurnDecisionAction) {
+                    if (!((TurnActionFactory.TurnDecisionAction) currentTurnAction).hasRunOnce) {
+                        System.out.println(currentTurnAction.actionDebugText);
+                    }
+                } else {
                     System.out.println(currentTurnAction.actionDebugText);
                 }
-            } else {
-                System.out.println(currentTurnAction.actionDebugText);
-            }*/
+            }
             currentTurnAction.performAction();
             currentTurnAction = currentTurnAction.getNext();
             if(queuedTurnAction != null) {
@@ -266,16 +278,22 @@ public class CurrentGameInterface extends WndInterface {
      */
     @Override
     public void handleInput(int keyCode) {
-        if(keyCode == KeyEvent.VK_S) {
+        if(keyCode == KeyEvent.VK_Q) {
             sortHand();
-        } else if(keyCode == KeyEvent.VK_R) {
+        } else if(GamePanel.DEBUG_MODE && keyCode == KeyEvent.VK_9) {
             revealHands();
-        } else if(keyCode == KeyEvent.VK_T) {
+        } else if(GamePanel.DEBUG_MODE && keyCode == KeyEvent.VK_8) {
             toggleTurnDirection();
-        } else if(keyCode == KeyEvent.VK_E) {
+        } else if(GamePanel.DEBUG_MODE && keyCode == KeyEvent.VK_7) {
             bottomPlayer.emptyHand();
-        } else if(keyCode == KeyEvent.VK_P) {
+        } else if(GamePanel.DEBUG_MODE && keyCode == KeyEvent.VK_6) {
             bottomPlayer.removeCard(bottomPlayer.getHand().get(0));
+        } else if(GamePanel.DEBUG_MODE && keyCode == KeyEvent.VK_5) {
+            debugShowTreeOnNewAction = !debugShowTreeOnNewAction;
+        } else if(GamePanel.DEBUG_MODE && keyCode == KeyEvent.VK_4) {
+            debugShowTaskActionNotes = !debugShowTaskActionNotes;
+        } else {
+            overlayManager.handleInput(keyCode);
         }
     }
 
@@ -417,8 +435,16 @@ public class CurrentGameInterface extends WndInterface {
     public void setCurrentTurnAction(TurnActionFactory.TurnAction turnAction) {
         if(currentTurnAction != null) {
             queuedTurnAction = turnAction;
+            if(GamePanel.DEBUG_MODE && debugShowTreeOnNewAction) {
+                System.out.println("Queued action sequence:");
+                TurnActionFactory.debugOutputTurnActionTree(turnAction);
+            }
         } else {
             currentTurnAction = turnAction;
+            if(GamePanel.DEBUG_MODE && debugShowTreeOnNewAction) {
+                System.out.println("Set action sequence:");
+                TurnActionFactory.debugOutputTurnActionTree(turnAction);
+            }
         }
     }
 

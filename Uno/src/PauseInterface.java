@@ -21,6 +21,10 @@ public class PauseInterface extends WndInterface {
      * A reference to the GamePanel to call back to it.
      */
     private final GamePanel gamePanel;
+    /**
+     * Text showing the messages with different controls.
+     */
+    private List<String> leftMessages, rightMessages;
 
     /**
      * Initialise the interface with bounds makes it ready to use.
@@ -37,6 +41,20 @@ public class PauseInterface extends WndInterface {
                         bounds.width-12, 30, "Return to Lobby", 3));
         buttonList.add(new Button(new Position(bounds.position.x+6, bounds.position.y+6+(30+6)*2+60),
                 bounds.width-12, 30, "Quit", 2));
+
+        leftMessages = new ArrayList<>();
+        rightMessages = new ArrayList<>();
+
+        leftMessages.add("Escape: Pause");
+        leftMessages.add("Q: Sort hand");
+
+        rightMessages.add("0: Turn on Debug");
+        rightMessages.add("9: Reveal All Hands");
+        rightMessages.add("8: Toggle Turn Direction");
+        rightMessages.add("7: Empty Player Hand");
+        rightMessages.add("6: Remove Left Player Card");
+        rightMessages.add("5: Toggle Show Turn Action Sequence");
+        rightMessages.add("4: Toggle Show Turn Action Tree On Set");
     }
 
     /**
@@ -62,12 +80,26 @@ public class PauseInterface extends WndInterface {
 
         g.setColor(new Color(165, 177, 94, 205));
         g.fillRect(bounds.position.x, bounds.position.y, bounds.width, bounds.height);
+        g.fillRect(170, 300, 160, 90);
+        g.fillRect(790, 220, 410, 300);
         g.setColor(Color.BLACK);
         g.drawRect(bounds.position.x, bounds.position.y, bounds.width, bounds.height);
+        g.drawRect(170, 300, 160, 90);
+        g.drawRect(790, 220, 410, 300);
         g.setFont(new Font("Arial", Font.BOLD, 40));
         int strWidth = g.getFontMetrics().stringWidth("Paused");
         g.drawString("Paused", bounds.position.x + bounds.width/2-strWidth/2, bounds.position.y+40);
         buttonList.forEach(button -> button.paint(g));
+
+        g.setFont(new Font("Arial", Font.BOLD, 20));
+        g.drawString("Controls", 210, 320);
+        for(int y = 0; y < leftMessages.size(); y++) {
+            g.drawString(leftMessages.get(y), 180, 350+y*30);
+        }
+        g.drawString("Debug Controls (0 first)", 880, 260);
+        for(int y = 0; y < rightMessages.size(); y++) {
+            g.drawString(rightMessages.get(y), 800, 300+y*30);
+        }
     }
 
     /**

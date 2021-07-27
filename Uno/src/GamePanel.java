@@ -31,6 +31,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
      * Reference to the active interface.
      */
     private WndInterface activeInterface;
+    /**
+     * When debug mode is enabled. Additional output and controls are enabled.
+     */
+    public static boolean DEBUG_MODE;
 
     /**
      * Configures the game ready to be played including selection of playing against either
@@ -50,6 +54,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
         addMouseListener(this);
         addMouseMotionListener(this);
+        DEBUG_MODE = false;
     }
 
     /**
@@ -109,6 +114,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         if(pauseWnd.isEnabled()) {
             pauseWnd.paint(g);
         }
+        if(DEBUG_MODE) {
+            g.setColor(Color.BLACK);
+            g.setFont(new Font("Arial", Font.BOLD, 20));
+            g.drawString("DEBUG ON", 10,20);
+        }
     }
 
     /**
@@ -138,6 +148,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     public void handleInput(int keyCode) {
         if(keyCode == KeyEvent.VK_ESCAPE) {
             setPauseState(!pauseWnd.isEnabled());
+        } else if(keyCode == KeyEvent.VK_0) {
+            DEBUG_MODE = !DEBUG_MODE;
         } else {
             activeInterface.handleInput(keyCode);
         }
