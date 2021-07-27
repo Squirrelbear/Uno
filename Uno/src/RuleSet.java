@@ -1,15 +1,3 @@
-/*
-    // Flag as unsafe at start of turn with 2 cards
-    Call Uno Action: Make player safe
-    Catch Player Action: MoveToPreviousPlayer -> Alert Caught -> Draw Card * 2 -> MoveToNextPlayer
-
-
-
-    Seven-O: 7 (Swap Action) 0 (all pass hand to left)
-
-    TODO
- */
-
 /**
  * Uno
  *

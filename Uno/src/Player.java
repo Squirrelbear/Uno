@@ -17,9 +17,8 @@ public class Player {
      * Types of players include:
      * ThisPlayer: Only one allowed, this is the player who is playing this game.
      * AIPlayer: Controlled by an AI (should be using an AIPlayer class).
-     * NetworkPlayer: Not implemented yet. // TODO
      */
-    public enum PlayerType { ThisPlayer, AIPlayer, NetworkPlayer}
+    public enum PlayerType { ThisPlayer, AIPlayer}
 
     /**
      * Safe indicates the player is not vulnerable to counter calls.

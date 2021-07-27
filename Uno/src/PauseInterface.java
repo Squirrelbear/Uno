@@ -24,7 +24,7 @@ public class PauseInterface extends WndInterface {
     /**
      * Text showing the messages with different controls.
      */
-    private List<String> leftMessages, rightMessages;
+    private final List<String> leftMessages, rightMessages;
 
     /**
      * Initialise the interface with bounds makes it ready to use.
