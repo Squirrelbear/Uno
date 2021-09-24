@@ -93,10 +93,58 @@ The below gif shows off an animation of the keep or play action with choosing to
 
 # 1.5 How the Core Game Works
 
+In this section I will just briefly describe the purpose of all the classes included in the project and then explain the TurnAction system and its integration into the game. You will find that all files have been documented describing their purpose so you can look in the individual files for additional details about any feature.
 
+Generic Classes:
+- Position: Defines a position with an x and y coordinate.
+- Rectangle: Defines a region of spec with a Position, width, and height.
+
+Core Windows and Generic Interface Elements:
+- Game: Simply an entry point to the application.
+- GamePanel: A JPanel that manages the collection of virtual windows being displayed through all the application.
+- CurrentGameInterface: An active game that is being played with cards on the field managed by players.
+- LobbyInterface: Represents the interface for managing choices of number of players and the rule set before starting a game.
+- PostGameInterface: The interface shown after a game has ended.
+- PauseInterface: Shown when the game is paused with Escape. This shows debug commands and controls that can be used by the player.
+- WndInterface: The generic interface used for all windows that are shown in the GamePanel.
+- Button: Defines a simple button as a Rectangle that renders itself and can be checked for hovering/clicking.
+
+Overlays Shown During Gameplay:
+- OverlayManager: Manages the state of all overlays that are currently shown.
+- AntiUnoButton: A more specialised button showing the ! to call out a player who did not call UNO.
+- UnoButton: Another more specialised button for showing the UNO to call out UNO! with only 2 cards left.
+- ChallengeOverlay: Poses the Challenge or Decline question for a Draw Four.
+- ChallengeFailedOverlay: Flashes an X over the player who failed to challenge a Draw Four.
+- ChallengeSuccessOverlay: Flashes a tick over the player who successfully challenged a Draw Four.
+- GeneralOverlayInterface: An interface that defines a showOverlay() method used for overlays that only show something with no decision.
+- TurnDecisionOverlayInterface: An interface that defines a showOverlay method with a reference to the TurnAction being used.
+- KeepOrPlayOverlay: Poses the question to keep or play a card drawn from the deck.
+- PlayDirectionAnimation: Perpetually shows two moving dots that circle the middle of the play area to show direction of play.
+- PlayerFlashOverlay: Shows all the +X cards overlay flashes and any with text where the colour is all the same.
+- StackChoiceOverlay: Prompts the user to choose to stack or decline and take the penalty.
+- PlayerSelectionOverlay: Used for the Seven-0 rule when playing a 7 to choose the player to swap hands with.
+- UNOCalledOverlay: Flashes UNO! over the player who called UNO.
+- WildColourSelectionOverlay: Prompts the user to select a colour from the colour wheel to use as the wild colour.
+- StatusOverlay: Shows a useful message indicating when any player is currently making a choice related to any of the other overlays mentioned above.
+
+Other Classes:
+- AIPlayer: Extends from a Player object and defines functionality to play as if they were a human player with no secret knowledge about the game state.
+- Card: Defines a Card including the rendering of the card. 
+- Deck: Defines a collection of Card objects that are ready to draw and shows visually the deck that can be clicked as an action.
+- LobbyPlayer: A prototype for generating the Player or AIPlayer objects allowing the changing of configuration related to the name and strategy. Also responsible for visually representing the elements in the Lobby.
+- Player: Defines a generic player that controls a collection of cards with methods for drawing and managing the cards in their hand.
+- RuleSet: Defines the set of rules that can be used in a game. This is used for creation of the rules in the Lobby and then is kept for the current game for reference.
+- TurnActionFactory: Used to generate the TurnAction sequences to control the flow of the game. 
+
+That concludes the classes that are part of the game. It is worth speaking briefly about the implementation of TurnActionFactory and how it is being used to manage the game state.
+
+TODO
 
 # 1.6 Known Issues and Potential Improvements
 
-
+The following are just some of the issues that could be improved with the game as it is currently.
+- If you are skipped with 1 card remaining the AI can call you out for not calling UNO forcing you to draw 2 cards.
+- The UNO button will appear for 1 frame sometimes when you reach 2 cards in your hand from playing a third card.
+- The timer currently does nothing when counting down during turn actions. All the enemy players are AI and will take their turns within about 3 seconds on average. If this game was to be shifted to multiplayer it would be necessary to enforce the timers. Running out on the timer would simply choose the default action for the current turn action.
 
 
