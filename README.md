@@ -20,7 +20,7 @@ the application from Game.java if you are compiling the code yourself.
 
 # 1.3 The Rules of UNO
 
-The Rules for UNO have all been designed based on referencing the wording used on the UNO Wikipedia page <https://en.wikipedia.org/wiki/Uno_(card_game))> and based on the official UNO available on Steam <https://store.steampowered.com/app/470220/UNO/>.
+The Rules for UNO have all been designed based on referencing the wording used on the UNO Wikipedia page <https://en.wikipedia.org/wiki/Uno_(card_game)> and based on the official UNO available on Steam <https://store.steampowered.com/app/470220/UNO/>.
 
 With everything disabled for the options, the base game should mimic the core base game. The 
 rules that can be added include: stacking +2/+4 cards, draw till a card can be played, for 
@@ -144,9 +144,15 @@ Other Classes:
 - RuleSet: Defines the set of rules that can be used in a game. This is used for creation of the rules in the Lobby and then is kept for the current game for reference.
 - TurnActionFactory: Used to generate the TurnAction sequences to control the flow of the game. 
 
-That concludes the classes that are part of the game. It is worth speaking briefly about the implementation of TurnActionFactory and how it is being used to manage the game state.
+That concludes the classes that are part of the game. It is worth speaking briefly about the implementation of TurnActionFactory and how it is being used to manage the game state. TurnActionFactory.java contains definitions of the data structure to construct linked list trees that can either perform an action or wait for a decision to occur. These are managed in the CurrentGameInterface class mostly by the updateTurnAction() method that is responsible for making any active turn action execute and then progress to the next state when it is ready. It is important that there is a concept of queued turn actions because when one chain of actions ends it can be continued with a new chain with some copied details from the previous one. It is important that the sequence of actions a player is responsible for are constrained to the playing of a single card. When a new card is played that starts a new queued chain. This keeps branching endless states constrained particularly in situations with stacking of cards. 
 
-TODO
+Everything begins for generating TurnAction trees by calling either TurnActionFactory.playCardAsAction(int playerID, int cardID, int faceValueID, int colourID) or TurnActionFactory.drawCardAsAction(int playerID). This mimics the entry points for what a player can do as the start of their turn and particularly for the playCardAsAction it will evaluate a lookup on the rules to determine what the associated action should be for that card. This allows dynamically changing the rules for cards like in the case of the Seven-0 rule. You can very easily get a debug output showing the constructed tree by calling for example: debugOutputTurnActionTree(TurnActionFactory.drawCardAsAction(0)); This would output:
+
+<img src="./images/image14_drawCardAsAction.JPG">
+
+Getting output from debugging the playCardAsAction does require a CurrentGameInterface object to have been created with a RuleSet. You can enable debug mode and view the debug output of the currently played cards during the game as it plays. The largest tree is shown below with the entire tree of all steps involved in the playing of a Draw Four card. The tree includes comments in its construction allowing for generation of useful status information. To explain what is shown in this tree, each line is a separate TurnAction. The TurnActions that begin with a - are executed as actions and continued past without any pause. Those with a ? next to them indicate it is a decision node. These have two possible options splitting based on meeting a condition. The game state is held at these nodes until the condition is met. In some cases this is requiring input from the user or the AI to make a decision like a response to the card being played, or in other cases it is simply to split the decision tree based on a variable that is already set. This is commonly used for decision making based on rules.
+
+<img src="./images/image15_playCardAsAction.JPG">
 
 # 1.6 Known Issues and Potential Improvements
 
