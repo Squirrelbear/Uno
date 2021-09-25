@@ -20,7 +20,15 @@ the application from Game.java if you are compiling the code yourself.
 
 # 1.3 The Rules of UNO
 
+The Rules for UNO have all been designed based on referencing the wording used on the UNO Wikipedia page <https://en.wikipedia.org/wiki/Uno_(card_game))> and based on the official UNO available on Steam <https://store.steampowered.com/app/470220/UNO/>.
 
+With everything disabled for the options, the base game should mimic the core base game. The 
+rules that can be added include: stacking +2/+4 cards, draw till a card can be played, for 
+two player reverse becomes a skip, Seven-0 makes the 7 become a swap with target player and 0
+ becomes everyone passing their cards to the next player, Jump In to change the turn order 
+ dynamically, forced play to require playing of drawn cards if they can be, no bluffing to 
+ remove any challenging of Draw Four cards, and custom score limits to determine the number 
+ of rounds.
 
 # 1.4 High Level Discussion About Implementation
 
