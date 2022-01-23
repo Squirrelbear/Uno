@@ -19,8 +19,8 @@ written with no sprites using draw calls in Java to render everything to the scr
 the application from Game.java if you are compiling the code yourself.
 
 - ([Youtube Demo](https://youtu.be/6feJMIqSF98))
-- ([C++ Version Youtube Demo](https://youtu.be/FrpcG1bfcx4) 
-- ([C++ with SFML Version GitHub](https://github.com/Squirrelbear/Uno-CPP)
+- ([C++ Version Youtube Demo](https://youtu.be/FrpcG1bfcx4)) 
+- ([C++ with SFML Version GitHub](https://github.com/Squirrelbear/Uno-CPP))
 
 # 1.3 The Rules of UNO
 
